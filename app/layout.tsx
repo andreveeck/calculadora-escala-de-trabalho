@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   },
   description:
     "Calculadora brasileira de escalas de trabalho 6x1, 12x36, 6x2 e 3x3.",
+  verification: {
+    google: "kWzYP7a99izKNojnNBZiZMrVHx9n9WDn2NZTv7yKvh4",
+  },
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     shortcut: [{ url: "/favicon.svg", type: "image/svg+xml" }],
