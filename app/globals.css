@@ -1814,11 +1814,22 @@ input:focus-visible {
 }
 
 .status-card.work {
-  background: linear-gradient(135deg, #4771cb 0%, #188fcb 100%);
+  background: linear-gradient(135deg, #17477e 0%, #0c6f9f 100%);
 }
 
 .status-card.rest {
-  background: linear-gradient(135deg, #18aaa3 0%, #33ccc5 100%);
+  background: linear-gradient(135deg, #0f766e 0%, #147a5d 100%);
+}
+
+.status-card.work span,
+.status-card.rest span {
+  color: #eaf6ff;
+  opacity: 1;
+}
+
+.status-card.work small,
+.status-card.rest small {
+  color: #f7fbff;
 }
 
 .affiliate-banner {
