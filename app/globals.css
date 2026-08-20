@@ -1692,11 +1692,16 @@ input:focus-visible {
 }
 
 .schedule-selector button.selected {
-  border-color: #ffffff;
-  background: #ffffff;
-  color: var(--brand-strong);
-  outline: 3px solid rgba(250, 157, 77, 0.72);
-  box-shadow: 0 16px 34px rgba(24, 81, 122, 0.18);
+  border-color: #063f95;
+  background: linear-gradient(135deg, #0c65d8 0%, #063f95 100%);
+  color: #ffffff;
+  outline: 3px solid rgba(255, 205, 102, 0.94);
+  box-shadow: 0 16px 34px rgba(3, 50, 117, 0.38);
+}
+
+.schedule-selector button.selected strong,
+.schedule-selector button.selected span {
+  color: #ffffff;
 }
 
 .schedule-selector strong {
@@ -2550,6 +2555,7 @@ button.admin-lock {
   font-size: 1.08rem;
 }
 
+.primary-action,
 .paid-offer .paid-action {
   border: 1px solid rgba(255, 255, 255, 0.8);
   background: #ffd166;
@@ -2559,6 +2565,7 @@ button.admin-lock {
   animation: paid-cta-pulse 2.4s ease-in-out infinite;
 }
 
+.primary-action:hover,
 .paid-offer .paid-action:hover {
   background: #ffe09a;
   box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.26), 0 16px 30px rgba(19, 57, 117, 0.38);
@@ -2576,6 +2583,7 @@ button.admin-lock {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .primary-action,
   .paid-offer .paid-action {
     animation: none;
   }
