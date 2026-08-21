@@ -29,7 +29,10 @@ export async function POST(request: Request): Promise<Response> {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name } },
+      options: {
+        data: { name },
+        emailRedirectTo: new URL("/acesso", request.url).toString(),
+      },
     });
 
     if (error) {

@@ -87,7 +87,10 @@ export function AccessFlow() {
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: email.trim().toLowerCase(),
           password,
-          options: { data: { name: normalizedName } },
+          options: {
+            data: { name: normalizedName },
+            emailRedirectTo: buildAccessRedirectUrl(),
+          },
         });
         if (signUpError) throw signUpError;
         if (!data.user) throw new Error("Não foi possível criar a conta.");
@@ -240,6 +243,10 @@ export function AccessFlow() {
       </section>
     </main>
   );
+}
+
+function buildAccessRedirectUrl(): string {
+  return new URL("/acesso", window.location.origin).toString();
 }
 
 async function loadOwnProfile(userId: string): Promise<Profile> {
