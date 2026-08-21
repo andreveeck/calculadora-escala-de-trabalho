@@ -18,6 +18,8 @@ type AccessState =
   | { kind: "email_confirmation"; email: string }
   | { kind: "authenticated"; user: User; profile: Profile };
 
+const alreadyRegisteredEmailMessage =
+  "Este e-mail já está cadastrado. Use a opção Entrar para acessar sua conta.";
 const pagBankPaymentUrl = "https://pag.ae/8255taD9t/button";
 const pagBankButtonImageUrl =
   "https://assets.pagseguro.com.br/ps-integration-assets/botoes/pagamentos/205x30-pagar.gif";
@@ -92,8 +94,14 @@ export function AccessFlow() {
             emailRedirectTo: buildAccessRedirectUrl(),
           },
         });
+        if (isAlreadyRegisteredAuthError(signUpError)) {
+          throw new Error(alreadyRegisteredEmailMessage);
+        }
         if (signUpError) throw signUpError;
         if (!data.user) throw new Error("Não foi possível criar a conta.");
+        if (isAlreadyRegisteredSignUp(data.user)) {
+          throw new Error(alreadyRegisteredEmailMessage);
+        }
 
         if (!data.session) {
           setState({
@@ -247,6 +255,22 @@ export function AccessFlow() {
 
 function buildAccessRedirectUrl(): string {
   return new URL("/acesso", window.location.origin).toString();
+}
+
+function isAlreadyRegisteredSignUp(user: User | null): boolean {
+  return Array.isArray(user?.identities) && user.identities.length === 0;
+}
+
+function isAlreadyRegisteredAuthError(error: unknown): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const maybeAuthError = error as { code?: unknown; message?: unknown };
+  return (
+    maybeAuthError.code === "user_already_exists" ||
+    maybeAuthError.message === "User already registered"
+  );
 }
 
 async function loadOwnProfile(userId: string): Promise<Profile> {

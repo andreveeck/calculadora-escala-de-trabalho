@@ -1,4 +1,8 @@
 import { createPublicServerSupabaseClient } from "@/src/infrastructure/supabase/server";
+import type { User } from "@supabase/supabase-js";
+
+const alreadyRegisteredEmailMessage =
+  "Este e-mail já está cadastrado. Use a opção Entrar para acessar sua conta.";
 
 export async function POST(request: Request): Promise<Response> {
   const supabase = createPublicServerSupabaseClient();
@@ -35,8 +39,22 @@ export async function POST(request: Request): Promise<Response> {
       },
     });
 
+    if (isAlreadyRegisteredAuthError(error)) {
+      return Response.json(
+        { message: alreadyRegisteredEmailMessage },
+        { status: 409 },
+      );
+    }
+
     if (error) {
       throw error;
+    }
+
+    if (isAlreadyRegisteredSignUp(data.user)) {
+      return Response.json(
+        { message: alreadyRegisteredEmailMessage },
+        { status: 409 },
+      );
     }
 
     return Response.json(
@@ -56,4 +74,20 @@ export async function POST(request: Request): Promise<Response> {
       { status: 400 },
     );
   }
+}
+
+function isAlreadyRegisteredSignUp(user: User | null): boolean {
+  return Array.isArray(user?.identities) && user.identities.length === 0;
+}
+
+function isAlreadyRegisteredAuthError(error: unknown): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const maybeAuthError = error as { code?: unknown; message?: unknown };
+  return (
+    maybeAuthError.code === "user_already_exists" ||
+    maybeAuthError.message === "User already registered"
+  );
 }
