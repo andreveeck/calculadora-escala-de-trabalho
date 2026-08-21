@@ -192,6 +192,39 @@ export function AdminPanel() {
     }
   }
 
+  async function deleteUser(user: AccessUser) {
+    const userName = user.name ?? user.email ?? "este usuário";
+    const confirmed = window.confirm(
+      `Excluir ${userName}? Esta ação remove a conta e o acesso anual do usuário.`,
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+    try {
+      const accessToken = await getAccessToken();
+      const response = await fetch("/api/admin/access-users", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: user.user_id }),
+      });
+      const payload = (await response.json()) as { message?: string };
+      if (!response.ok) {
+        throw new Error(payload.message ?? "Não foi possível excluir o usuário.");
+      }
+
+      await loadAdminData();
+    } catch (caught) {
+      setError(toMessage(caught));
+      setIsLoading(false);
+    }
+  }
+
   if (adminState === "checking") {
     return (
       <main className="admin-login-page">
@@ -313,7 +346,7 @@ export function AdminPanel() {
                   <span>{user.name ?? "Sem nome"}</span>
                   <span>{user.email ?? "Sem e-mail"}</span>
                   <span>{formatAccessStatus(user.access_status)}</span>
-                  <strong>
+                  <strong className="admin-user-actions">
                     {user.access_status === "approved" ? (
                       <button
                         type="button"
@@ -332,6 +365,16 @@ export function AdminPanel() {
                         Liberar usuário
                       </button>
                     )}
+                    {user.role !== "admin" ? (
+                      <button
+                        type="button"
+                        className="admin-delete-button"
+                        disabled={isLoading}
+                        onClick={() => deleteUser(user)}
+                      >
+                        Excluir usuário
+                      </button>
+                    ) : null}
                   </strong>
                 </div>
               ))

@@ -1048,7 +1048,7 @@ button.admin-lock {
 
 .users-table-head,
 .users-table-row {
-  grid-template-columns: 1fr 1.25fr 0.85fr 0.85fr;
+  grid-template-columns: 1fr 1.25fr 0.8fr 1fr;
 }
 
 .users-table-row button {
@@ -1062,8 +1062,17 @@ button.admin-lock {
   font-weight: 800;
 }
 
+.admin-user-actions {
+  display: grid;
+  gap: 8px;
+}
+
 .users-table-row button.admin-danger-button {
   background: #9b1c1c;
+}
+
+.users-table-row button.admin-delete-button {
+  background: #6b7280;
 }
 
 .users-table-row button:disabled,
@@ -2121,6 +2130,10 @@ button.admin-lock {
 
 .users-table-row button.admin-danger-button {
   background: var(--danger);
+}
+
+.users-table-row button.admin-delete-button {
+  background: #4b5563;
 }
 
 .admin-table-row {

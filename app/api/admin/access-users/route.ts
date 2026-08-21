@@ -116,6 +116,55 @@ export async function POST(request: Request): Promise<Response> {
   return Response.json({ user: updatedProfile });
 }
 
+export async function DELETE(request: Request): Promise<Response> {
+  const authenticated = await authenticateAdminRequest(request);
+  if (!authenticated) {
+    return unauthorizedResponse();
+  }
+
+  let body: { userId?: string };
+  try {
+    body = (await request.json()) as typeof body;
+  } catch {
+    return Response.json({ message: "Corpo da requisição inválido." }, { status: 400 });
+  }
+
+  const userId = body.userId?.trim() ?? "";
+  if (!userId) {
+    return Response.json({ message: "Usuário inválido." }, { status: 400 });
+  }
+
+  if (userId === authenticated.user.id) {
+    return Response.json(
+      { message: "Você não pode excluir sua própria conta administrativa." },
+      { status: 400 },
+    );
+  }
+
+  const { data: currentProfile, error: currentError } =
+    await authenticated.adminClient
+      .from("profiles")
+      .select("id,user_id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+  if (currentError || !currentProfile) {
+    return Response.json({ message: "Usuário não encontrado." }, { status: 404 });
+  }
+
+  const { error: deleteError } =
+    await authenticated.adminClient.auth.admin.deleteUser(userId);
+
+  if (deleteError) {
+    return Response.json(
+      { message: "Não foi possível excluir o usuário." },
+      { status: 500 },
+    );
+  }
+
+  return Response.json({ deletedUserId: userId });
+}
+
 function unauthorizedResponse(): Response {
   return Response.json(
     { message: "Acesso restrito a administradores autenticados." },
