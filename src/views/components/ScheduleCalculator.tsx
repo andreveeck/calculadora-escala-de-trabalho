@@ -155,9 +155,9 @@ function ScheduleResult({ result }: { result: ScheduleCalculationResult }) {
           />
           <span>
             <small>Oferta parceira</small>
-            <strong>Conheça o Viva Sempre com Dinheiro.</strong>
+            <strong>Transforme seu tempo livre em dinheiro ainda hoje.</strong>
           </span>
-          <em>Ver oferta</em>
+          <em>Dinheiro agora!</em>
         </a>
       </div>
 
