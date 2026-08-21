@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { createScheduleController } from "@/src/controllers/controllerFactory";
 import { BrazilDate } from "@/src/shared/date/BrazilDate";
@@ -140,10 +141,23 @@ function ScheduleResult({ result }: { result: ScheduleCalculationResult }) {
       </div>
 
       <div className="affiliate-banner" aria-label="Banner de afiliado">
-        <span>Oferta parceira</span>
-        <strong>Organize sua rotina com desconto em cursos e ferramentas.</strong>
-        <a href="https://www.mercadolivre.com.br/" target="_blank" rel="noreferrer">
-          Ver oferta
+        <a
+          className="affiliate-banner-link"
+          href="https://go.hotmart.com/H107261677B?redirectionUrl=https%3A%2F%2Flp.vivasemprecomdinheiro.com.br%2F"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <Image
+            src="/design/viva-sempre-dinheiro-logo.webp"
+            alt="Viva Sempre com Dinheiro"
+            width={687}
+            height={216}
+          />
+          <span>
+            <small>Oferta parceira</small>
+            <strong>Conheça o Viva Sempre com Dinheiro.</strong>
+          </span>
+          <em>Ver oferta</em>
         </a>
       </div>
 
