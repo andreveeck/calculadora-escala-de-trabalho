@@ -1,11 +1,13 @@
 import type { ScheduleType } from "@/src/models/schedules/ScheduleType";
 import { ScheduleCalculator } from "@/src/views/components/ScheduleCalculator";
+import { DeveloperContactFooter } from "@/src/views/components/DeveloperContactFooter";
 
 interface ScaleCalculatorPageProps {
   scheduleType: ScheduleType;
   title: string;
   description: string;
   bullets: string[];
+  showDeveloperContact?: boolean;
 }
 
 export function ScaleCalculatorPage({
@@ -13,6 +15,7 @@ export function ScaleCalculatorPage({
   title,
   description,
   bullets,
+  showDeveloperContact = false,
 }: ScaleCalculatorPageProps) {
   return (
     <main>
@@ -28,6 +31,9 @@ export function ScaleCalculatorPage({
           ))}
         </ul>
       </section>
+      {showDeveloperContact ? (
+        <DeveloperContactFooter appName="Minha Escala" />
+      ) : null}
     </main>
   );
 }

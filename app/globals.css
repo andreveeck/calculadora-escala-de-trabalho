@@ -579,6 +579,50 @@ h2 {
   line-height: 1.5;
 }
 
+.developer-contact-footer {
+  width: min(1160px, calc(100% - 32px));
+  margin: -20px auto 44px;
+  padding: 0;
+}
+
+.developer-contact-footer > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  border: 1px solid #b9e3c4;
+  border-radius: 8px;
+  background: #f0fff4;
+  color: #0f3d22;
+}
+
+.developer-contact-footer span {
+  font-weight: 800;
+}
+
+.developer-contact-footer a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 8px;
+  background: #128c4a;
+  color: #ffffff;
+  font-weight: 850;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 12px 24px rgba(18, 140, 74, 0.18);
+}
+
+.developer-contact-footer a:hover,
+.developer-contact-footer a:focus-visible {
+  background: #0d743c;
+  box-shadow: 0 14px 28px rgba(18, 140, 74, 0.26);
+  transform: translateY(-1px);
+}
+
 .legal-page,
 .admin-page {
   max-width: 760px;
@@ -1311,6 +1355,17 @@ button.admin-lock {
   .affiliate-banner,
   .paid-offer,
   .bottom-banner {
+    padding: 16px;
+  }
+
+  .developer-contact-footer {
+    width: min(calc(100% - 16px), 560px);
+    margin-bottom: 28px;
+  }
+
+  .developer-contact-footer > div {
+    align-items: stretch;
+    flex-direction: column;
     padding: 16px;
   }
 

@@ -21,6 +21,7 @@ export default function Home() {
           "Resultado imediato.",
           "Escalas 6x1, 6x2, 12x36 e 3x3.",
         ]}
+        showDeveloperContact
       />
   );
 }
