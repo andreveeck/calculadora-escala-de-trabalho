@@ -91,7 +91,17 @@ export function ScheduleCalculator({
         </div>
 
         <div className="calculator-input-area">
-          <p className="schedule-selector-title">Escolha a sua escala</p>
+          <div className="input-step">
+            <div className="input-step-head">
+              <span className="step-badge" aria-hidden="true">1</span>
+              <p className="schedule-selector-title">Escolha a sua escala</p>
+            </div>
+            <p className="input-step-note">
+              Toque na escala que você trabalha — o calendário é montado
+              conforme essa escolha.
+            </p>
+          </div>
+
           <div className="schedule-selector" role="tablist" aria-label="Tipo de escala">
             {scheduleOptions.map((option) => (
               <button
@@ -107,6 +117,17 @@ export function ScheduleCalculator({
             ))}
           </div>
 
+          <div className="input-step">
+            <div className="input-step-head">
+              <span className="step-badge" aria-hidden="true">2</span>
+              <p className="schedule-selector-title">Informe sua data de referência</p>
+            </div>
+            <p className="input-step-note">
+              O dia que você informar é o ponto de partida do cálculo. Use uma
+              data em que você tenha certeza se trabalhou ou folgou.
+            </p>
+          </div>
+
           <div className="form-controls">
             <label className="date-field">
               <span>{referenceHelp[scheduleType]}</span>
@@ -115,6 +136,10 @@ export function ScheduleCalculator({
                 value={referenceDate}
                 onChange={(event) => setReferenceDate(event.target.value)}
               />
+              <small className="date-field-hint">
+                A data de hoje já vem preenchida. Se você não tiver certeza
+                sobre hoje, escolha uma data que você conheça bem.
+              </small>
             </label>
 
             {error ? <p className="form-error">{error}</p> : null}

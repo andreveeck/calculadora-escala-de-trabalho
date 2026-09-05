@@ -2932,3 +2932,63 @@ button.admin-lock {
     max-width: min(54vw, 210px);
   }
 }
+
+/* ===== Destaque das instruções da calculadora (passos 1 e 2) ===== */
+.input-step {
+  display: grid;
+  gap: 8px;
+}
+
+.input-step-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calculator-input-area .schedule-selector-title {
+  font-size: 1.06rem;
+  line-height: 1.2;
+}
+
+.step-badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffd166;
+  color: #1c3a52;
+  font-size: 1rem;
+  font-weight: 850;
+  line-height: 1;
+  box-shadow: 0 4px 12px rgba(6, 44, 74, 0.32);
+}
+
+.input-step-note {
+  margin: 0;
+  padding-left: 40px;
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.calculator-input-area .date-field > span {
+  color: var(--brand-strong);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.date-field-hint {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 520px) {
+  .input-step-note {
+    font-size: 0.9rem;
+  }
+}
