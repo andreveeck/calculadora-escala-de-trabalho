@@ -465,8 +465,11 @@ h2 {
 }
 
 .calendar-day {
-  display: grid;
-  align-content: space-between;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -480,11 +483,6 @@ h2 {
 
 .calendar-day.rest span {
   color: #ffffff;
-}
-
-.calendar-day div {
-  display: grid;
-  gap: 2px;
 }
 
 .calendar-day small {
@@ -2834,22 +2832,13 @@ button.admin-lock {
   }
 
   .calendar-day {
-    align-content: start;
-    gap: 7px;
+    gap: 2px;
     padding: 6px 4px;
     border-radius: 10px;
   }
 
   .calendar-day span {
     font-size: 1rem;
-  }
-
-  .calendar-day div {
-    gap: 0;
-  }
-
-  .calendar-weekday {
-    display: none;
   }
 
   .calendar-day small {

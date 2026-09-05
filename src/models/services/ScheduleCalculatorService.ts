@@ -1,6 +1,7 @@
 import { WorkDay } from "@/src/models/entities/WorkDay";
 import { ScheduleFactory } from "@/src/models/schedules/ScheduleFactory";
 import { BrazilDate } from "@/src/shared/date/BrazilDate";
+import { ANNUAL_CALENDAR_PRICE_IN_CENTS } from "@/src/shared/constants/pricing";
 import type {
   CalculateScheduleInput,
   ScheduleCalculationResult,
@@ -32,7 +33,7 @@ export class ScheduleCalculatorService {
         schedule.getDay(date, referenceDate),
       ),
       paidPreview: {
-        priceInCents: 599,
+        priceInCents: ANNUAL_CALENDAR_PRICE_IN_CENTS,
         benefit: "Calendário anual vitalício e consulta de qualquer período de 12 meses.",
       },
     };

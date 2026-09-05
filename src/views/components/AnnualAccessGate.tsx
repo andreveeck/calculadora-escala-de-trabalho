@@ -12,18 +12,19 @@ type AccessState =
   | { status: "denied"; message: string };
 
 interface AnnualAccessGateProps {
-  initialScheduleType?: string;
-  initialReferenceDate?: string;
+  /** Presente quando o token de compartilhamento é válido (server-side). */
+  sharedScheduleType?: string;
+  sharedReferenceDate?: string;
 }
 
 export function AnnualAccessGate({
-  initialScheduleType,
-  initialReferenceDate,
+  sharedScheduleType,
+  sharedReferenceDate,
 }: AnnualAccessGateProps) {
   const isSharedCalendar =
-    isScheduleType(initialScheduleType) &&
-    initialReferenceDate !== undefined &&
-    BrazilDate.isValidIsoDate(initialReferenceDate);
+    isScheduleType(sharedScheduleType) &&
+    sharedReferenceDate !== undefined &&
+    BrazilDate.isValidIsoDate(sharedReferenceDate);
   const supabase = createBrowserSupabaseClient();
   const [accessState, setAccessState] = useState<AccessState>(() =>
     supabase
@@ -82,8 +83,8 @@ export function AnnualAccessGate({
   if (isSharedCalendar) {
     return (
       <AnnualCalendarExperience
-        initialScheduleType={initialScheduleType}
-        initialReferenceDate={initialReferenceDate}
+        initialScheduleType={sharedScheduleType}
+        initialReferenceDate={sharedReferenceDate}
         readOnly
       />
     );
@@ -117,8 +118,8 @@ export function AnnualAccessGate({
 
   return (
     <AnnualCalendarExperience
-      initialScheduleType={initialScheduleType}
-      initialReferenceDate={initialReferenceDate}
+      initialScheduleType={sharedScheduleType}
+      initialReferenceDate={sharedReferenceDate}
     />
   );
 }

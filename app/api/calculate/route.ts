@@ -12,10 +12,11 @@ export async function POST(request: Request): Promise<Response> {
       throw new Error("Escolha uma escala válida.");
     }
 
+    // body.today é ignorado intencionalmente: o servidor usa sempre
+    // a data atual para evitar manipulação client-side.
     const result = createScheduleController().calculate({
       scheduleType: scheduleType as ScheduleType,
       referenceDate: String(body.referenceDate),
-      today: typeof body.today === "string" ? body.today : undefined,
     });
 
     return Response.json(result);

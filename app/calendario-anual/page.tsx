@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AnnualAccessGate } from "@/src/views/components/AnnualAccessGate";
+import { verifyShareToken } from "@/src/shared/tokens/calendarShareToken";
 
 export const metadata: Metadata = {
   title: "Calendário anual | Minha Escala",
@@ -13,20 +14,24 @@ export const metadata: Metadata = {
 
 interface AnnualCalendarPageProps {
   searchParams: Promise<{
-    escala?: string;
-    referencia?: string;
+    token?: string;
   }>;
 }
 
 export default async function AnnualCalendarPage({
   searchParams,
 }: AnnualCalendarPageProps) {
-  const { escala, referencia } = await searchParams;
+  const { token } = await searchParams;
+
+  // Tokens assinados pelo servidor são a única forma de acessar
+  // o calendário compartilhado sem login. Parâmetros de URL em
+  // texto puro (escala/referencia) não são mais aceitos.
+  const sharedParams = token ? verifyShareToken(token) : null;
 
   return (
     <AnnualAccessGate
-      initialScheduleType={escala}
-      initialReferenceDate={referencia}
+      sharedScheduleType={sharedParams?.scheduleType}
+      sharedReferenceDate={sharedParams?.referenceDate}
     />
   );
 }

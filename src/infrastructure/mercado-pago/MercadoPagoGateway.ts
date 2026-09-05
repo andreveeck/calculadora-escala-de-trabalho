@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import type { PaymentGateway } from "@/src/models/services/PaymentService";
 
 interface MercadoPagoConfig {
@@ -55,12 +56,45 @@ export class MercadoPagoGateway implements PaymentGateway {
     };
   }
 
-  verifyWebhookSignature(rawBody: string, signature: string | null): boolean {
-    if (!signature || !this.config.webhookSecret) {
+  verifyWebhookSignature(
+    rawBody: string,
+    signature: string | null,
+    requestId: string | null,
+  ): boolean {
+    if (!signature || !this.config.webhookSecret || !requestId) {
       return false;
     }
 
-    return rawBody.length > 0 && signature.length > 0;
+    try {
+      const tsMatch = signature.match(/ts=(\d+)/);
+      const v1Match = signature.match(/v1=([a-f0-9]+)/i);
+      if (!tsMatch || !v1Match) {
+        return false;
+      }
+
+      const ts = tsMatch[1];
+      const providedHash = v1Match[1];
+
+      // Mercado Pago assina: HMAC-SHA256(secret, "id:<request-id>;request-id:<request-id>;ts:<timestamp>;")
+      const payload = `id:${requestId};request-id:${requestId};ts:${ts};`;
+      const expectedHash = createHmac("sha256", this.config.webhookSecret)
+        .update(payload)
+        .digest("hex");
+
+      // Comparação em tempo constante para evitar timing attacks
+      if (expectedHash.length !== providedHash.length) {
+        return false;
+      }
+
+      let mismatch = 0;
+      for (let i = 0; i < expectedHash.length; i++) {
+        mismatch |= expectedHash.charCodeAt(i) ^ providedHash.charCodeAt(i);
+      }
+
+      return mismatch === 0;
+    } catch {
+      return false;
+    }
   }
 
   async fetchPaymentStatus(

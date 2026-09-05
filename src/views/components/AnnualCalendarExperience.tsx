@@ -78,15 +78,29 @@ export function AnnualCalendarExperience({
     { rest: 0, work: 0 },
   );
 
-  function copyShareLink() {
-    const params = new URLSearchParams({
-      escala: scheduleType,
-      referencia: referenceDate,
-    });
-    const url = `${window.location.origin}/calendario-anual?${params.toString()}`;
-    void navigator.clipboard?.writeText(url);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+  async function copyShareLink() {
+    try {
+      const response = await fetch("/api/calendar-share-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scheduleType,
+          referenceDate,
+        }),
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const { token } = (await response.json()) as { token: string };
+      const url = `${window.location.origin}/calendario-anual?token=${encodeURIComponent(token)}`;
+      void navigator.clipboard?.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // Silenciar erro de rede; o botão simplesmente não reage
+    }
   }
 
   return (

@@ -20,6 +20,7 @@ export class PaymentController {
   handleWebhook(input: {
     rawBody: string;
     signature: string | null;
+    requestId: string | null;
     externalId: string;
   }) {
     if (!input.externalId) {

@@ -1,6 +1,7 @@
 import type { Payment } from "@/src/models/entities/Payment";
 import type { AccessEntitlementRepository } from "@/src/models/repositories/AccessEntitlementRepository";
 import type { PaymentRepository } from "@/src/models/repositories/PaymentRepository";
+import { ANNUAL_CALENDAR_PRICE_IN_CENTS } from "@/src/shared/constants/pricing";
 
 export interface PaymentGateway {
   createCheckout(input: {
@@ -8,12 +9,12 @@ export interface PaymentGateway {
     amountInCents: number;
     description: string;
   }): Promise<{ externalId: string; checkoutUrl: string }>;
-  verifyWebhookSignature(rawBody: string, signature: string | null): boolean;
+  verifyWebhookSignature(rawBody: string, signature: string | null, requestId: string | null): boolean;
   fetchPaymentStatus(externalId: string): Promise<"approved" | "rejected" | "pending">;
 }
 
 export class PaymentService {
-  static readonly annualCalendarPriceInCents = 599;
+  static readonly annualCalendarPriceInCents = ANNUAL_CALENDAR_PRICE_IN_CENTS;
 
   constructor(
     private readonly paymentRepository: PaymentRepository,
@@ -47,9 +48,10 @@ export class PaymentService {
   async handleWebhook(input: {
     rawBody: string;
     signature: string | null;
+    requestId: string | null;
     externalId: string;
   }): Promise<Payment | null> {
-    if (!this.gateway.verifyWebhookSignature(input.rawBody, input.signature)) {
+    if (!this.gateway.verifyWebhookSignature(input.rawBody, input.signature, input.requestId)) {
       throw new Error("Webhook inválido.");
     }
 

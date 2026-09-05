@@ -1,6 +1,9 @@
 import { SupabaseLeadRepository } from "@/src/infrastructure/supabase/SupabaseLeadRepository";
 import { createServerSupabaseClient } from "@/src/infrastructure/supabase/server";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_EMAIL_LENGTH = 254;
+
 export async function POST(request: Request): Promise<Response> {
   const supabase = createServerSupabaseClient();
   if (!supabase) {
@@ -10,7 +13,16 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  const body = (await request.json()) as { email?: string; consent?: boolean };
+  let body: { email?: string; consent?: boolean };
+  try {
+    body = (await request.json()) as typeof body;
+  } catch {
+    return Response.json(
+      { message: "Corpo da requisição inválido." },
+      { status: 400 },
+    );
+  }
+
   if (!body.email || body.consent !== true) {
     return Response.json(
       { message: "Informe email e consentimento." },
@@ -18,8 +30,20 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
+  const normalizedEmail = body.email.trim().toLowerCase();
+
+  if (
+    !EMAIL_REGEX.test(normalizedEmail) ||
+    normalizedEmail.length > MAX_EMAIL_LENGTH
+  ) {
+    return Response.json(
+      { message: "Formato de e-mail inválido." },
+      { status: 400 },
+    );
+  }
+
   const lead = await new SupabaseLeadRepository(supabase).create(
-    body.email,
+    normalizedEmail,
     body.consent,
   );
 

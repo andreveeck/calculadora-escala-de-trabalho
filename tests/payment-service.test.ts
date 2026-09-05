@@ -117,11 +117,13 @@ test("approved webhook grants annual access once", async () => {
   await service.handleWebhook({
     rawBody: "{}",
     signature: "valid",
+    requestId: "req-1",
     externalId: "external-1",
   });
   await service.handleWebhook({
     rawBody: "{}",
     signature: "valid",
+    requestId: "req-1",
     externalId: "external-1",
   });
 
@@ -140,6 +142,7 @@ test("rejected webhook does not grant paid access", async () => {
   await service.handleWebhook({
     rawBody: "{}",
     signature: "valid",
+    requestId: "req-1",
     externalId: "external-1",
   });
 
@@ -158,6 +161,7 @@ test("invalid webhook is rejected", async () => {
     service.handleWebhook({
       rawBody: "{}",
       signature: "invalid",
+      requestId: "req-1",
       externalId: "external-1",
     }),
     /webhook inválido/i,

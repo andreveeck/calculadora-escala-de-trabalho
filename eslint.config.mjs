@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "node_modules.install-recovery/**",
   ]),
   eslint.configs.recommended,
   ...tseslint.configs.recommended,

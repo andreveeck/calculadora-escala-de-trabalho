@@ -333,19 +333,19 @@ export function AdminPanel() {
 
           <div className="admin-table" role="table" aria-label="Usuários cadastrados">
             <div className="admin-table-row admin-table-head users-table-head" role="row">
-              <span>Nome</span>
-              <span>E-mail</span>
-              <span>Status</span>
-              <span>Ação</span>
+              <span role="columnheader">Nome</span>
+              <span role="columnheader">E-mail</span>
+              <span role="columnheader">Status</span>
+              <span role="columnheader">Ação</span>
             </div>
             {users.length === 0 ? (
               <div className="admin-empty-state">Nenhum usuário cadastrado.</div>
             ) : (
               users.map((user) => (
                 <div className="admin-table-row users-table-row" role="row" key={user.id}>
-                  <span>{user.name ?? "Sem nome"}</span>
-                  <span>{user.email ?? "Sem e-mail"}</span>
-                  <span>{formatAccessStatus(user.access_status)}</span>
+                  <span role="cell">{user.name ?? "Sem nome"}</span>
+                  <span role="cell">{user.email ?? "Sem e-mail"}</span>
+                  <span role="cell">{formatAccessStatus(user.access_status)}</span>
                   <strong className="admin-user-actions">
                     {user.access_status === "approved" ? (
                       <button
@@ -391,20 +391,20 @@ export function AdminPanel() {
           </div>
           <div className="admin-table" role="table" aria-label="Pagamentos recentes">
             <div className="admin-table-row admin-table-head" role="row">
-              <span>Data</span>
-              <span>Usuário</span>
-              <span>Status</span>
-              <span>Valor</span>
+              <span role="columnheader">Data</span>
+              <span role="columnheader">Usuário</span>
+              <span role="columnheader">Status</span>
+              <span role="columnheader">Valor</span>
             </div>
             {payments.length === 0 ? (
               <div className="admin-empty-state">Nenhum pagamento registrado.</div>
             ) : (
               payments.map((payment) => (
                 <div className="admin-table-row" role="row" key={payment.id}>
-                  <span>{formatDate(payment.created_at)}</span>
-                  <span>{userLabel(payment.user_id, users)}</span>
-                  <span>{payment.status}</span>
-                  <strong>
+                  <span role="cell">{formatDate(payment.created_at)}</span>
+                  <span role="cell">{userLabel(payment.user_id, users)}</span>
+                  <span role="cell">{payment.status}</span>
+                  <strong role="cell">
                     {payment.amount == null ? "Não informado" : formatCurrency(Number(payment.amount))}
                   </strong>
                 </div>

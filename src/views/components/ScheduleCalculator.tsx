@@ -207,18 +207,24 @@ function MonthCalendar({ days }: { days: ScheduleCalculationResult["currentMonth
   const firstDay = new Date(`${days[0]?.date ?? "2026-01-01"}T00:00:00.000Z`);
   const offset = firstDay.getUTCDay();
 
+  const monthLabel = days[0]
+    ? formatMonthTitle(days[0].date)
+    : "Calendário";
+
   return (
-    <div className="month-calendar">
+    <div className="month-calendar" role="grid" aria-label={monthLabel}>
       {Array.from({ length: offset }, (_, index) => (
-        <span className="empty-day" key={`empty-${index}`} />
+        <span className="empty-day" key={`empty-${index}`} role="presentation" />
       ))}
       {days.map((day) => (
-        <div className={`calendar-day ${day.status}`} key={day.date}>
+        <div
+          className={`calendar-day ${day.status}`}
+          role="gridcell"
+          aria-label={`${Number(day.date.slice(-2))}, ${formatWeekday(day.date)}, ${day.status === "rest" ? "Folga" : "Trabalho"}`}
+          key={day.date}
+        >
           <span>{Number(day.date.slice(-2))}</span>
-          <div>
-            <small className="calendar-weekday">{formatWeekday(day.date)}</small>
-            <small>{day.status === "rest" ? "Folga" : "Trabalho"}</small>
-          </div>
+          <small className="calendar-weekday">{formatWeekdayShort(day.date)}</small>
         </div>
       ))}
     </div>
@@ -241,6 +247,18 @@ function formatWeekday(value: string): string {
   }).format(date);
 
   return weekday.replace(/-feira$/i, "");
+}
+
+function formatWeekdayShort(value: string): string {
+  const date = new Date(`${value}T00:00:00.000Z`);
+  const label = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "UTC",
+    weekday: "short",
+  })
+    .format(date)
+    .replace(".", "");
+
+  return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
 function formatMonthTitle(value?: string): string {
