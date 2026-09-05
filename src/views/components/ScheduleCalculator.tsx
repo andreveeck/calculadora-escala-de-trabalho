@@ -41,6 +41,17 @@ const referenceHelp: Record<ScheduleType, string> = {
   "3x3": "Informe o primeiro dia de trabalho do ciclo 3x3.",
 };
 
+const referencePointNote: Record<ScheduleType, string> = {
+  "6x1":
+    "O dia que você informar é o ponto de partida do cálculo. Use uma data em que você tenha certeza de que estava de folga.",
+  "12x36":
+    "O dia que você informar é o ponto de partida do cálculo. Use a data em que você iniciou um plantão e tenha certeza dela.",
+  "6x2":
+    "O dia que você informar é o ponto de partida do cálculo. Use o primeiro dia de trabalho após as suas folgas e tenha certeza dele.",
+  "3x3":
+    "O dia que você informar é o ponto de partida do cálculo. Use o primeiro dia de trabalho do ciclo e tenha certeza dele.",
+};
+
 interface ScheduleCalculatorProps {
   initialScheduleType: ScheduleType;
 }
@@ -123,8 +134,7 @@ export function ScheduleCalculator({
               <p className="schedule-selector-title">Informe sua data de referência</p>
             </div>
             <p className="input-step-note">
-              O dia que você informar é o ponto de partida do cálculo. Use uma
-              data em que você tenha certeza se trabalhou ou folgou.
+              {referencePointNote[scheduleType]}
             </p>
           </div>
 
