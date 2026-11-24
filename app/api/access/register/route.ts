@@ -1,4 +1,8 @@
 import { createPublicServerSupabaseClient } from "@/src/infrastructure/supabase/server";
+import {
+  connectionErrorMessage,
+  isConnectionFailure,
+} from "@/src/infrastructure/supabase/authErrors";
 import type { User } from "@supabase/supabase-js";
 
 const alreadyRegisteredEmailMessage =
@@ -66,6 +70,13 @@ export async function POST(request: Request): Promise<Response> {
       { status: 201 },
     );
   } catch (error) {
+    if (isConnectionFailure(error)) {
+      return Response.json(
+        { message: connectionErrorMessage },
+        { status: 503 },
+      );
+    }
+
     return Response.json(
       {
         message:

@@ -3,6 +3,10 @@
 import { type FormEvent, useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { createBrowserSupabaseClient } from "@/src/infrastructure/supabase/client";
+import {
+  connectionErrorMessage,
+  isConnectionFailure,
+} from "@/src/infrastructure/supabase/authErrors";
 
 type AccessStatus = "pending_payment" | "approved" | "blocked";
 
@@ -286,7 +290,11 @@ async function loadOwnProfile(userId: string): Promise<Profile> {
     .single();
 
   if (error || !data) {
-    throw new Error("Não foi possível carregar seu perfil de acesso.");
+    throw new Error(
+      isConnectionFailure(error)
+        ? connectionErrorMessage
+        : "Não foi possível carregar seu perfil de acesso.",
+    );
   }
 
   return data as Profile;
@@ -379,6 +387,10 @@ function AccessStatus({
 function toMessage(error: unknown): string {
   if (!(error instanceof Error)) {
     return "Não foi possível continuar.";
+  }
+
+  if (isConnectionFailure(error)) {
+    return connectionErrorMessage;
   }
 
   const translations: Record<string, string> = {

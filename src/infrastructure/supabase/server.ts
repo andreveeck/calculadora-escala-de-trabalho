@@ -15,6 +15,12 @@ type SupabaseRuntimeEnvironment = {
 export type AuthenticatedRequest = {
   user: User;
   adminClient: SupabaseClient;
+  /**
+   * Cliente que fala em nome do próprio usuário (publishable key + bearer
+   * token). É o caminho correto para ler o perfil: as policies de ownership
+   * fazem o isolamento e nenhuma rota depende de privilégio de service role.
+   */
+  userClient: SupabaseClient;
 };
 
 function getServerEnvironment(): SupabaseServerEnvironment | null {
@@ -82,7 +88,21 @@ export async function authenticateRequest(
     return null;
   }
 
-  return { user, adminClient };
+  return { user, adminClient, userClient: createUserScopedClient(env, accessToken) };
+}
+
+function createUserScopedClient(
+  env: SupabaseServerEnvironment,
+  accessToken: string,
+): SupabaseClient {
+  return createClient(env.url, env.publishableKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
+  });
 }
 
 export async function authenticateAdminRequest(

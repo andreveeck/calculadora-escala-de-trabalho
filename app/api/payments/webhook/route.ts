@@ -6,8 +6,17 @@ export async function POST(request: Request): Promise<Response> {
   const requestId = request.headers.get("x-request-id");
   const controller = createPaymentController();
 
-  if (!rawBody || !controller) {
-    return Response.json({ message: "Webhook inválido." }, { status: 401 });
+  // Serviço sem credenciais não é "requisição inválida": o Mercado Pago deve
+  // receber 503 e repetir o envio quando a configuração for corrigida.
+  if (!controller) {
+    return Response.json(
+      { message: "Pagamento ainda não configurado." },
+      { status: 503 },
+    );
+  }
+
+  if (!rawBody) {
+    return Response.json({ message: "Corpo do webhook vazio." }, { status: 400 });
   }
 
   let payload: { data?: { id?: string }; id?: string };

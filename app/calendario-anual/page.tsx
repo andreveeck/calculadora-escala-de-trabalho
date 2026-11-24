@@ -25,13 +25,16 @@ export default async function AnnualCalendarPage({
 
   // Tokens assinados pelo servidor são a única forma de acessar
   // o calendário compartilhado sem login. Parâmetros de URL em
-  // texto puro (escala/referencia) não são mais aceitos.
+  // texto puro (escala/referencia) não são mais aceitos, e token
+  // expirado/adulterado cai no fluxo normal de login/pagamento.
   const sharedParams = token ? verifyShareToken(token) : null;
+  const shareLinkInvalid = Boolean(token) && !sharedParams;
 
   return (
     <AnnualAccessGate
       sharedScheduleType={sharedParams?.scheduleType}
       sharedReferenceDate={sharedParams?.referenceDate}
+      shareLinkInvalid={shareLinkInvalid}
     />
   );
 }

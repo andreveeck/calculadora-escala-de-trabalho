@@ -301,3 +301,16 @@ grant select on public.banners to anon, authenticated;
 revoke insert, update, delete on public.payments from anon, authenticated;
 revoke update (role, user_id, email) on public.profiles
   from anon, authenticated;
+
+-- O service role é usado somente nas rotas de servidor (service_role key), mas
+-- projetos novos da Supabase não concedem privilégios automáticos a ele nas
+-- tabelas criadas por SQL. Sem estes grants toda consulta server-side falha
+-- com 42501 (permission denied for table ...), e o app responde 404/500 mesmo
+-- com o banco migrado.
+grant usage on schema public to service_role;
+grant all privileges on all tables in schema public to service_role;
+grant all privileges on all sequences in schema public to service_role;
+alter default privileges in schema public
+  grant all privileges on tables to service_role;
+alter default privileges in schema public
+  grant all privileges on sequences to service_role;

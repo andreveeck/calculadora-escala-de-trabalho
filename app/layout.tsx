@@ -45,8 +45,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
+      {/* Extensões de navegador (ex.: ColorZilla adiciona cz-shortcut-listen)
+          alteram o <body> antes da hidratação; sem isto o React 19 acusa
+          mismatch de atributo em desenvolvimento. Só afeta atributos do body. */}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <header className="site-header">
           <div className="site-header-inner">

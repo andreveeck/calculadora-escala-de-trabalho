@@ -15,11 +15,14 @@ interface AnnualAccessGateProps {
   /** Presente quando o token de compartilhamento é válido (server-side). */
   sharedScheduleType?: string;
   sharedReferenceDate?: string;
+  /** Token presente na URL, porém expirado, adulterado ou inválido. */
+  shareLinkInvalid?: boolean;
 }
 
 export function AnnualAccessGate({
   sharedScheduleType,
   sharedReferenceDate,
+  shareLinkInvalid = false,
 }: AnnualAccessGateProps) {
   const isSharedCalendar =
     isScheduleType(sharedScheduleType) &&
@@ -106,8 +109,16 @@ export function AnnualAccessGate({
       <main className="access-page">
         <section className="access-card">
           <p className="eyebrow">Acesso anual</p>
-          <h1>Calendário bloqueado</h1>
-          <p>{accessState.message}</p>
+          <h1>
+            {shareLinkInvalid
+              ? "Link de compartilhamento inválido"
+              : "Calendário bloqueado"}
+          </h1>
+          <p>
+            {shareLinkInvalid
+              ? "Este link expirou ou não é válido. Entre com sua conta liberada para abrir o calendário anual."
+              : accessState.message}
+          </p>
           <a className="access-primary-link" href="/acesso">
             Fazer login ou cadastro
           </a>

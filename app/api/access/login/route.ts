@@ -1,4 +1,8 @@
 import { createPublicServerSupabaseClient } from "@/src/infrastructure/supabase/server";
+import {
+  connectionErrorMessage,
+  isConnectionFailure,
+} from "@/src/infrastructure/supabase/authErrors";
 
 export async function POST(request: Request): Promise<Response> {
   const supabase = createPublicServerSupabaseClient();
@@ -31,6 +35,13 @@ export async function POST(request: Request): Promise<Response> {
       expiresAt: data.session.expires_at,
     });
   } catch (error) {
+    if (isConnectionFailure(error)) {
+      return Response.json(
+        { message: connectionErrorMessage },
+        { status: 503 },
+      );
+    }
+
     return Response.json(
       {
         message:

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { createScheduleController } from "@/src/controllers/controllerFactory";
+import { createBrowserSupabaseClient } from "@/src/infrastructure/supabase/client";
 import type { WorkDay } from "@/src/models/entities/WorkDay";
 import type { ScheduleType } from "@/src/models/schedules/ScheduleType";
 import { BrazilDate } from "@/src/shared/date/BrazilDate";
@@ -41,6 +42,7 @@ export function AnnualCalendarExperience({
       : BrazilDate.today().toIso(),
   );
   const [copied, setCopied] = useState(false);
+  const [shareError, setShareError] = useState<string | null>(null);
 
   const months = useMemo(() => {
     const safeReferenceDate = BrazilDate.isValidIsoDate(referenceDate)
@@ -79,10 +81,28 @@ export function AnnualCalendarExperience({
   );
 
   async function copyShareLink() {
+    setShareError(null);
+
     try {
+      const supabase = createBrowserSupabaseClient();
+      const { data: sessionData } = supabase
+        ? await supabase.auth.getSession()
+        : { data: { session: null } };
+      const accessToken = sessionData.session?.access_token;
+
+      if (!accessToken) {
+        setShareError(
+          "Entre novamente na sua conta para gerar o link de compartilhamento.",
+        );
+        return;
+      }
+
       const response = await fetch("/api/calendar-share-token", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
         body: JSON.stringify({
           scheduleType,
           referenceDate,
@@ -90,6 +110,13 @@ export function AnnualCalendarExperience({
       });
 
       if (!response.ok) {
+        const payload = (await response.json().catch(() => ({}))) as {
+          message?: string;
+        };
+        setShareError(
+          payload.message ??
+            "Não foi possível gerar o link de compartilhamento.",
+        );
         return;
       }
 
@@ -99,7 +126,9 @@ export function AnnualCalendarExperience({
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
     } catch {
-      // Silenciar erro de rede; o botão simplesmente não reage
+      setShareError(
+        "Não foi possível gerar o link de compartilhamento. Tente novamente.",
+      );
     }
   }
 
@@ -152,6 +181,8 @@ export function AnnualCalendarExperience({
           <button type="button" onClick={copyShareLink}>
             {copied ? "Link copiado" : "Copiar link"}
           </button>
+
+          {shareError ? <p className="form-error">{shareError}</p> : null}
         </section>
       )}
 

@@ -42,10 +42,19 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  const lead = await new SupabaseLeadRepository(supabase).create(
-    normalizedEmail,
-    body.consent,
-  );
+  // Sem este try/catch qualquer falha do banco (tabela ausente, RLS, conexão)
+  // escapava do handler e o cliente recebia um 500 sem corpo e sem mensagem.
+  try {
+    const lead = await new SupabaseLeadRepository(supabase).create(
+      normalizedEmail,
+      body.consent,
+    );
 
-  return Response.json(lead, { status: 201 });
+    return Response.json(lead, { status: 201 });
+  } catch {
+    return Response.json(
+      { message: "Não foi possível registrar seu contato. Tente novamente." },
+      { status: 500 },
+    );
+  }
 }
