@@ -225,7 +225,7 @@ de três fontes.
 
 | Categoria | `kind` | Origem | Datas |
 | --- | --- | --- | --- |
-| Feriado nacional | `national` | Leis federais | 01/01, 21/04, 01/05, 07/09, 12/10, 02/11, 15/11, 20/11, 25/12 e Sexta-feira Santa |
+| Feriado nacional | `national` | Leis federais + data religiosa | 01/01, 21/04, 01/05, 07/09, 12/10, 02/11, 15/11, 20/11, 25/12, Sexta-feira Santa e Páscoa (domingo) |
 | Ponto facultativo | `optional` | Decreto/portaria federal | Carnaval (segunda e terça) e Corpus Christi |
 | Feriado estadual | `state` | Lei estadual, por região | RS: 20/09 Revolução Farroupilha (Dia do Gaúcho) |
 
@@ -237,9 +237,12 @@ Fatos confirmados nas fontes oficiais — **não pesquisar de novo**:
   estaduais.
 - **Carnaval** é ponto facultativo federal na segunda e na terça; **Corpus Christi** é ponto
   facultativo federal, 60 dias após a Páscoa.
-- Datas de 2026: Carnaval 16 e 17/02, Sexta-feira Santa 03/04, Corpus Christi 04/06,
-  Revolução Farroupilha 20/09.
-- Datas de 2027: Carnaval 08 e 09/02, Sexta-feira Santa 26/03, Corpus Christi 27/05.
+- **Páscoa** entra na mesma categoria da Sexta-feira Santa: o domingo de Páscoa não é feriado
+  por lei federal, mas é data religiosa fechada no país e o calendário marca as duas.
+- Datas de 2026: Carnaval 16 e 17/02, Páscoa 05/04, Sexta-feira Santa 03/04, Corpus Christi
+  04/06, Revolução Farroupilha 20/09.
+- Datas de 2027: Carnaval 08 e 09/02, Páscoa 28/03, Sexta-feira Santa 26/03, Corpus Christi
+  27/05.
 
 Regra de arquitetura: feriado é **apresentação**, não regra de escala. Não alterar `WorkDay`
 nem `ScheduleCalculatorService`; o status de trabalho/folga continua vindo dele.
@@ -349,6 +352,7 @@ function movableHolidays(year: number): Holiday[] {
   return [
     { date: dateFromEaster(-48), name: "Carnaval (segunda-feira)", kind: "optional" },
     { date: dateFromEaster(-47), name: "Carnaval (terça-feira)", kind: "optional" },
+    { date: easter, name: "Páscoa", kind: "national" },
     { date: dateFromEaster(-2), name: "Sexta-feira Santa", kind: "national" },
     { date: dateFromEaster(60), name: "Corpus Christi", kind: "optional" },
   ];

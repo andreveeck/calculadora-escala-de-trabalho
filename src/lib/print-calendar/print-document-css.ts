@@ -130,6 +130,38 @@ export const PRINT_DOCUMENT_CSS = `
   border-color: #9d174d;
 }
 
+/* Feriados do mês escritos dentro do container do mês. */
+.print-doc .annual-month-holidays {
+  gap: 0.4mm;
+  margin: 2mm 0 0;
+  padding: 1.2mm 0 0;
+  border-top: 1px solid #c9d6e2;
+  color: #0b1b2b;
+  font-size: 6pt;
+  line-height: 1.2;
+}
+
+.print-doc .annual-month-holidays__item {
+  gap: 1mm;
+}
+
+.print-doc .annual-month-holidays__name {
+  color: #0b1b2b;
+  font-weight: 700;
+}
+
+.print-doc .annual-month-holidays__item.holiday--national .annual-month-holidays__date {
+  color: #b45309;
+}
+
+.print-doc .annual-month-holidays__item.holiday--optional .annual-month-holidays__date {
+  color: #7e22ce;
+}
+
+.print-doc .annual-month-holidays__item.holiday--state .annual-month-holidays__date {
+  color: #9d174d;
+}
+
 .print-doc__legend {
   display: flex;
   flex-wrap: wrap;

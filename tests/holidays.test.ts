@@ -22,6 +22,15 @@ test("Páscoa cai sempre entre 22/03 e 25/04", () => {
   }
 });
 
+test("Domingo de Páscoa também é feriado nacional", () => {
+  assert.deepEqual(getHoliday("2026-04-05"), {
+    date: "2026-04-05",
+    name: "Páscoa",
+    kind: "national",
+  });
+  assert.equal(getHoliday("2027-03-28")?.name, "Páscoa");
+});
+
 test("Sexta-feira Santa é feriado nacional dois dias antes da Páscoa", () => {
   assert.deepEqual(getHoliday("2026-04-03"), {
     date: "2026-04-03",
@@ -68,8 +77,8 @@ test("20 de setembro é feriado estadual no RS e não existe em Brasil", () => {
 });
 
 test("contagem por região em 2026", () => {
-  assert.equal(getHolidays(2026, "br").length, 13); // 10 nacionais + 3 facultativos
-  assert.equal(getHolidays(2026, "rs").length, 14);
+  assert.equal(getHolidays(2026, "br").length, 14); // 11 nacionais + 3 facultativos
+  assert.equal(getHolidays(2026, "rs").length, 15);
 });
 
 test("nenhuma data se repete", () => {

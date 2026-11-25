@@ -1078,6 +1078,47 @@ h2 {
   border-color: var(--holiday-state);
 }
 
+/* Feriados do mês descritos dentro do card, sem depender do tooltip. */
+.annual-month-holidays {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 10px 0 0;
+  padding: 9px 0 0;
+  border-top: 1px solid rgba(23, 71, 126, 0.16);
+  list-style: none;
+  font-size: 0.62rem;
+  line-height: 1.25;
+}
+
+.annual-month-holidays__item {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.annual-month-holidays__date {
+  flex: 0 0 auto;
+  font-weight: 850;
+}
+
+.annual-month-holidays__name {
+  color: var(--brand-strong);
+  font-weight: 650;
+}
+
+.annual-month-holidays__item.holiday--national .annual-month-holidays__date {
+  color: var(--holiday-national);
+}
+
+.annual-month-holidays__item.holiday--optional .annual-month-holidays__date {
+  color: var(--holiday-optional);
+}
+
+.annual-month-holidays__item.holiday--state .annual-month-holidays__date {
+  color: var(--holiday-state);
+}
+
 .annual-holiday-legend {
   display: flex;
   flex-wrap: wrap;

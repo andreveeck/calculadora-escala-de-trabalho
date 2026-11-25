@@ -103,6 +103,7 @@ function movableHolidays(year: number): Holiday[] {
   return [
     { date: dateFromEaster(-48), name: "Carnaval (segunda-feira)", kind: "optional" },
     { date: dateFromEaster(-47), name: "Carnaval (terça-feira)", kind: "optional" },
+    { date: easter, name: "Páscoa", kind: "national" },
     { date: dateFromEaster(-2), name: "Sexta-feira Santa", kind: "national" },
     { date: dateFromEaster(60), name: "Corpus Christi", kind: "optional" },
   ];

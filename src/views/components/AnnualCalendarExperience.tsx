@@ -22,6 +22,7 @@ import {
   type HolidayRegion,
 } from "@/src/shared/date/holidays";
 import { MiniMonth } from "./annual/MiniMonth";
+import { MonthHolidays } from "./annual/MonthHolidays";
 import { PrintCalendarDialog } from "./annual/PrintCalendarDialog";
 
 const scheduleOptions: Array<{ type: ScheduleType; label: string }> = [
@@ -269,6 +270,7 @@ export function AnnualCalendarExperience({
             <article className="annual-month" key={month.key}>
               <h2>{month.label}</h2>
               <MiniMonth days={month.days} region={region} />
+              <MonthHolidays days={month.days} region={region} />
             </article>
           ))}
         </section>

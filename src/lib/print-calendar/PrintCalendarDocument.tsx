@@ -2,6 +2,7 @@ import type { ScheduleType } from "@/src/models/schedules/ScheduleType";
 import { formatFullDate } from "@/src/shared/date/calendarLabels";
 import { REGION_LABELS, type HolidayRegion } from "@/src/shared/date/holidays";
 import { MiniMonth } from "@/src/views/components/annual/MiniMonth";
+import { MonthHolidays } from "@/src/views/components/annual/MonthHolidays";
 import { buildPageStyle } from "./page-style";
 import { PRINT_DOCUMENT_CSS } from "./print-document-css";
 import { selectMonths } from "./select-months";
@@ -49,6 +50,7 @@ export function PrintCalendarDocument({
           <section className="print-doc__month" key={month.key}>
             <h2>{month.label}</h2>
             <MiniMonth days={month.days} region={region} />
+            <MonthHolidays days={month.days} region={region} />
           </section>
         ))}
       </div>

@@ -27,6 +27,14 @@ export function formatFullDate(value: string): string {
   }).format(new Date(`${value}T00:00:00.000Z`));
 }
 
+export function formatDayMonth(value: string): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "UTC",
+    day: "2-digit",
+    month: "2-digit",
+  }).format(new Date(`${value}T00:00:00.000Z`));
+}
+
 export function formatWeekdayShort(value: string): string {
   return capitalizeFirstLetter(
     new Intl.DateTimeFormat("pt-BR", {
