@@ -1,11 +1,28 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createScheduleController } from "@/src/controllers/controllerFactory";
 import { createBrowserSupabaseClient } from "@/src/infrastructure/supabase/client";
-import type { WorkDay } from "@/src/models/entities/WorkDay";
+import { createDefaultPrintOptions } from "@/src/lib/print-calendar/print-options";
+import { PrintCalendarDocument } from "@/src/lib/print-calendar/PrintCalendarDocument";
+import type {
+  AnnualMonth,
+  PrintOptions,
+} from "@/src/lib/print-calendar/types";
+import { useCalendarPrint } from "@/src/lib/print-calendar/use-calendar-print";
 import type { ScheduleType } from "@/src/models/schedules/ScheduleType";
 import { BrazilDate } from "@/src/shared/date/BrazilDate";
+import {
+  addMonths,
+  formatFullDate,
+  formatMonthYear,
+} from "@/src/shared/date/calendarLabels";
+import {
+  DEFAULT_HOLIDAY_REGION,
+  type HolidayRegion,
+} from "@/src/shared/date/holidays";
+import { MiniMonth } from "./annual/MiniMonth";
+import { PrintCalendarDialog } from "./annual/PrintCalendarDialog";
 
 const scheduleOptions: Array<{ type: ScheduleType; label: string }> = [
   { type: "6x1", label: "6x1" },
@@ -43,8 +60,9 @@ export function AnnualCalendarExperience({
   );
   const [copied, setCopied] = useState(false);
   const [shareError, setShareError] = useState<string | null>(null);
+  const [region, setRegion] = useState<HolidayRegion>(DEFAULT_HOLIDAY_REGION);
 
-  const months = useMemo(() => {
+  const months = useMemo((): AnnualMonth[] => {
     const safeReferenceDate = BrazilDate.isValidIsoDate(referenceDate)
       ? referenceDate
       : BrazilDate.today().toIso();
@@ -59,11 +77,31 @@ export function AnnualCalendarExperience({
       });
 
       return {
+        key: normalizedMonth.slice(0, 7),
         label: formatMonthYear(normalizedMonth),
         days: result.currentMonth,
       };
     });
   }, [controller, referenceDate, scheduleType]);
+
+  const [printOpen, setPrintOpen] = useState(false);
+  const [printOptions, setPrintOptions] = useState<PrintOptions>(() =>
+    createDefaultPrintOptions(months),
+  );
+  const [printRequest, setPrintRequest] = useState(0);
+  const printDocumentRef = useRef<HTMLDivElement>(null);
+  const printTitleRef = useRef(printOptions.documentTitle);
+  const lastPrintedRequestRef = useRef(0);
+  const printFn = useCalendarPrint(printDocumentRef, printTitleRef);
+
+  useEffect(() => {
+    if (printRequest === 0 || lastPrintedRequestRef.current === printRequest) {
+      return;
+    }
+
+    lastPrintedRequestRef.current = printRequest;
+    printFn();
+  }, [printRequest, printFn]);
 
   const totals = months.reduce(
     (summary, month) => {
@@ -133,165 +171,156 @@ export function AnnualCalendarExperience({
   }
 
   return (
-    <main className="annual-page">
-      <section className="annual-hero">
-        <div>
-          <p className="eyebrow">
-            {readOnly ? "Calendário compartilhado" : "Acesso anual liberado"}
-          </p>
-          <h1>Calendário de 12 meses</h1>
-          <p>
-            Consulte qualquer período do ano, veja suas folgas com antecedência
-            e compartilhe o calendário com quem organiza a rotina com você.
-          </p>
-        </div>
-      </section>
-
-      {readOnly ? (
-        <section className="annual-share-context" aria-label="Dados do calendário compartilhado">
-          <span>Visualização somente leitura</span>
-          <strong>Escala {scheduleType}</strong>
-          <span>Referência: {formatFullDate(referenceDate)}</span>
+    <>
+      <main className="annual-page">
+        <section className="annual-hero">
+          <div>
+            <p className="eyebrow">
+              {readOnly ? "Calendário compartilhado" : "Acesso anual liberado"}
+            </p>
+            <h1>Calendário de 12 meses</h1>
+            <p>
+              Consulte qualquer período do ano, veja suas folgas com
+              antecedência e compartilhe o calendário com quem organiza a rotina
+              com você.
+            </p>
+          </div>
         </section>
-      ) : (
-        <section className="annual-controls" aria-label="Filtros do calendário anual">
-          <div className="annual-scale-selector">
-            {scheduleOptions.map((option) => (
-              <button
-                key={option.type}
-                type="button"
-                className={option.type === scheduleType ? "selected" : ""}
-                onClick={() => setScheduleType(option.type)}
-                aria-pressed={option.type === scheduleType}
+
+        {readOnly ? (
+          <section
+            className="annual-share-context"
+            aria-label="Dados do calendário compartilhado"
+          >
+            <span>Visualização somente leitura</span>
+            <strong>Escala {scheduleType}</strong>
+            <span>Referência: {formatFullDate(referenceDate)}</span>
+          </section>
+        ) : (
+          <section
+            className="annual-controls"
+            aria-label="Filtros do calendário anual"
+          >
+            <div className="annual-scale-selector">
+              {scheduleOptions.map((option) => (
+                <button
+                  key={option.type}
+                  type="button"
+                  className={option.type === scheduleType ? "selected" : ""}
+                  onClick={() => setScheduleType(option.type)}
+                  aria-pressed={option.type === scheduleType}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            <label>
+              <span>{referenceLabels[scheduleType]}</span>
+              <input
+                type="date"
+                value={referenceDate}
+                onChange={(event) => setReferenceDate(event.target.value)}
+              />
+            </label>
+
+            <button type="button" onClick={copyShareLink}>
+              {copied ? "Link copiado" : "Copiar link"}
+            </button>
+
+            {shareError ? <p className="form-error">{shareError}</p> : null}
+          </section>
+        )}
+
+        <div className="annual-print-actions">
+          <div className="annual-print-actions__filters">
+            <label className="annual-region-field">
+              <span>Feriados</span>
+              <select
+                value={region}
+                onChange={(event) =>
+                  setRegion(event.target.value as HolidayRegion)
+                }
               >
-                {option.label}
-              </button>
-            ))}
+                <option value="br">Brasil</option>
+                <option value="rs">Brasil + RS</option>
+              </select>
+            </label>
+
+            <ul
+              className="annual-holiday-legend"
+              aria-label="Legenda de feriados"
+            >
+              <li className="is-national">Feriado nacional</li>
+              <li className="is-optional">Ponto facultativo</li>
+              {region === "rs" ? (
+                <li className="is-state">Feriado estadual (RS)</li>
+              ) : null}
+            </ul>
           </div>
 
-          <label>
-            <span>{referenceLabels[scheduleType]}</span>
-            <input
-              type="date"
-              value={referenceDate}
-              onChange={(event) => setReferenceDate(event.target.value)}
-            />
-          </label>
-
-          <button type="button" onClick={copyShareLink}>
-            {copied ? "Link copiado" : "Copiar link"}
+          <button type="button" onClick={() => setPrintOpen(true)}>
+            Imprimir calendário
           </button>
+        </div>
 
-          {shareError ? <p className="form-error">{shareError}</p> : null}
+        <section className="annual-calendar-grid" aria-label="Calendário anual">
+          {months.map((month) => (
+            <article className="annual-month" key={month.key}>
+              <h2>{month.label}</h2>
+              <MiniMonth days={month.days} region={region} />
+            </article>
+          ))}
         </section>
-      )}
 
-      <section className="annual-calendar-grid" aria-label="Calendário anual">
-        {months.map((month) => (
-          <article className="annual-month" key={month.label}>
-            <h2>{month.label}</h2>
-            <MiniMonth days={month.days} />
+        <section className="annual-summary" aria-label="Resumo do período">
+          <article>
+            <span>Folgas</span>
+            <strong>{totals.rest}</strong>
           </article>
-        ))}
-      </section>
+          <article>
+            <span>Trabalho</span>
+            <strong>{totals.work}</strong>
+          </article>
+          <article>
+            <span>Período</span>
+            <strong>12 meses</strong>
+          </article>
+        </section>
+      </main>
 
-      <section className="annual-summary" aria-label="Resumo do período">
-        <article>
-          <span>Folgas</span>
-          <strong>{totals.rest}</strong>
-        </article>
-        <article>
-          <span>Trabalho</span>
-          <strong>{totals.work}</strong>
-        </article>
-        <article>
-          <span>Período</span>
-          <strong>12 meses</strong>
-        </article>
-      </section>
-    </main>
+      {printOpen ? (
+        <PrintCalendarDialog
+          months={months}
+          initialOptions={printOptions}
+          onCancel={() => setPrintOpen(false)}
+          onConfirm={(nextOptions) => {
+            printTitleRef.current = nextOptions.documentTitle;
+            setPrintOptions(nextOptions);
+            setPrintOpen(false);
+            setPrintRequest((current) => current + 1);
+          }}
+        />
+      ) : null}
+
+      {/*
+        Documento sempre montado para o react-to-print poder clonar.
+        O contêiner oculto fica FORA do ref: display: none é o padrão
+        documentado pela biblioteca e não afeta o clone.
+      */}
+      <div aria-hidden="true" style={{ display: "none" }}>
+        <div ref={printDocumentRef}>
+          <PrintCalendarDocument
+            months={months}
+            options={printOptions}
+            scheduleType={scheduleType}
+            referenceDate={referenceDate}
+            region={region}
+          />
+        </div>
+      </div>
+    </>
   );
-}
-
-function MiniMonth({ days }: { days: WorkDay[] }) {
-  const firstDay = new Date(`${days[0]?.date ?? "2026-01-01"}T00:00:00.000Z`);
-  const offset = firstDay.getUTCDay();
-
-  return (
-    <div className="annual-mini-month">
-      {Array.from({ length: offset }, (_, index) => (
-        <span className="annual-empty-day" key={`empty-${index}`} />
-      ))}
-      {days.map((day) => (
-        <span
-          className={`annual-mini-day ${day.status}`}
-          title={`${formatWeekdayLong(day.date)}, ${formatFullDate(day.date)} - ${
-            day.status === "rest" ? "Folga" : "Trabalho"
-          }`}
-          aria-label={`${Number(day.date.slice(-2))}, ${formatWeekdayLong(
-            day.date,
-          )}, ${day.status === "rest" ? "Folga" : "Trabalho"}`}
-          key={day.date}
-        >
-          <strong>{Number(day.date.slice(-2))}</strong>
-          <small>{formatWeekdayShort(day.date)}</small>
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function formatMonthYear(value: string): string {
-  const label = new Intl.DateTimeFormat("pt-BR", {
-    timeZone: "UTC",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(`${value}T00:00:00.000Z`));
-
-  return capitalizeFirstLetter(label);
-}
-
-function addMonths(value: string, amount: number): string {
-  const [year, month] = value.split("-").map(Number);
-  const date = new Date(Date.UTC(year, month - 1 + amount, 1));
-
-  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(
-    2,
-    "0",
-  )}-01`;
-}
-
-function formatFullDate(value: string): string {
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: "UTC",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(new Date(`${value}T00:00:00.000Z`));
-}
-
-function formatWeekdayShort(value: string): string {
-  return capitalizeFirstLetter(
-    new Intl.DateTimeFormat("pt-BR", {
-      timeZone: "UTC",
-      weekday: "short",
-    })
-      .format(new Date(`${value}T00:00:00.000Z`))
-      .replace(".", ""),
-  );
-}
-
-function formatWeekdayLong(value: string): string {
-  return capitalizeFirstLetter(
-    new Intl.DateTimeFormat("pt-BR", {
-      timeZone: "UTC",
-      weekday: "long",
-    }).format(new Date(`${value}T00:00:00.000Z`)),
-  );
-}
-
-function capitalizeFirstLetter(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function isScheduleType(value: string | undefined): value is ScheduleType {

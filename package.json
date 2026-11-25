@@ -9,7 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "tsx --test tests/schedule-rules.test.ts tests/payment-service.test.ts tests/schema-rls.test.mjs tests/auth-security.test.mjs tests/webhook-signature.test.ts tests/calendar-share-token.test.ts",
+    "test": "tsx --test tests/schedule-rules.test.ts tests/payment-service.test.ts tests/schema-rls.test.mjs tests/auth-security.test.mjs tests/webhook-signature.test.ts tests/calendar-share-token.test.ts tests/print-calendar.test.ts tests/holidays.test.ts",
     "apply:schema": "node scripts/apply-schema.mjs",
     "verify:admin-cycle": "node scripts/verify-admin-cycle.mjs",
     "typecheck": "tsc --noEmit",
@@ -21,7 +21,8 @@
     "drizzle-orm": "0.45.2",
     "next": "16.2.6",
     "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "react-dom": "19.2.6",
+    "react-to-print": "^3.3.0"
   },
   "devDependencies": {
     "@eslint/js": "9.39.4",
@@ -42,6 +43,5 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.59.3"
   },
-  "type": "module",
-  "optionalDependencies": {}
+  "type": "module"
 }

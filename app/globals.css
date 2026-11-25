@@ -17,6 +17,9 @@
   --rest-soft: #dff7e8;
   --warning: #8a5a00;
   --warning-soft: #fff4d8;
+  --holiday-national: #b45309;
+  --holiday-optional: #7e22ce;
+  --holiday-state: #9d174d;
 }
 
 @theme inline {
@@ -1045,6 +1048,212 @@ h2 {
 
 .annual-mini-day.rest {
   background: var(--rest);
+  color: #ffffff;
+}
+
+/* Feriados: círculo em volta do número do dia, com fundo branco e halo
+   para dar contraste tanto sobre o azul de trabalho quanto sobre o verde da folga. */
+.annual-mini-day.holiday strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6em;
+  height: 1.6em;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--brand);
+  box-shadow: 0 0 0 1.5px #ffffff;
+}
+
+.annual-mini-day.holiday--national strong {
+  border-color: var(--holiday-national);
+}
+
+.annual-mini-day.holiday--optional strong {
+  border-color: var(--holiday-optional);
+}
+
+.annual-mini-day.holiday--state strong {
+  border-color: var(--holiday-state);
+}
+
+.annual-holiday-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.annual-holiday-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.annual-holiday-legend li::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border: 2.5px solid transparent;
+  border-radius: 999px;
+}
+
+.annual-holiday-legend .is-national::before {
+  border-color: var(--holiday-national);
+}
+
+.annual-holiday-legend .is-optional::before {
+  border-color: var(--holiday-optional);
+}
+
+.annual-holiday-legend .is-state::before {
+  border-color: var(--holiday-state);
+}
+
+.annual-print-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.annual-print-actions__filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.annual-print-actions > button {
+  min-height: 46px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 800;
+}
+
+.annual-region-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.annual-region-field select {
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--foreground);
+}
+
+.print-dialog {
+  width: min(560px, calc(100vw - 32px));
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: var(--shadow-card);
+}
+
+.print-dialog::backdrop {
+  background: rgba(16, 35, 59, 0.45);
+}
+
+.print-dialog h2 {
+  margin: 0 0 16px;
+  font-size: 1.15rem;
+}
+
+.print-dialog__grid {
+  display: grid;
+  gap: 16px;
+}
+
+.print-dialog fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.print-dialog legend {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.print-dialog label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.print-dialog select,
+.print-dialog input {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--foreground);
+}
+
+.print-dialog__radios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.print-dialog__radios label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.print-dialog__hint {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.print-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.print-dialog__actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.print-dialog__actions button:first-child {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.print-dialog__actions button:last-child {
+  background: var(--accent-strong);
   color: #ffffff;
 }
 
