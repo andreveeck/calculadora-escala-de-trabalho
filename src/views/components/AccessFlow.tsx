@@ -179,6 +179,10 @@ export function AccessFlow() {
           Cadastre seu login para pagar pelo PagBank. Após a confirmação, o
           administrador libera seu calendário anual.
         </p>
+        <p>
+          O plano anual inclui 12 meses de calendário, impressão em A4 e
+          arquivo em PDF.
+        </p>
 
         <div className="access-mode" aria-label="Escolha o modo de acesso">
           <button

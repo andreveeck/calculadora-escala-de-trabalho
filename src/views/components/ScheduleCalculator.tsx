@@ -209,8 +209,16 @@ function ScheduleResult({ result }: { result: ScheduleCalculationResult }) {
           <h2>Calendário anual por R$ 49,90</h2>
           <p>
             Pague uma única vez e veja seu ano inteiro sem refazer contas todo
-            mês. Seu acesso fica salvo na conta para consultar quando precisar.
+            mês. A escala impressa vai para a geladeira; o PDF fica no celular.
+            O acesso fica salvo na sua conta.
           </p>
+          <ul
+            className="paid-offer__features"
+            aria-label="O que o plano anual inclui"
+          >
+            <li>Imprimir em A4</li>
+            <li>Salvar em PDF</li>
+          </ul>
         </div>
         <a className="paid-action" href="/acesso">
           Pagar agora

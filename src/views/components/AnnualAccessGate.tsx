@@ -119,6 +119,10 @@ export function AnnualAccessGate({
               ? "Este link expirou ou não é válido. Entre com sua conta liberada para abrir o calendário anual."
               : accessState.message}
           </p>
+          <p>
+            Com o plano anual você consulta 12 meses e imprime ou salva a escala
+            em PDF.
+          </p>
           <a className="access-primary-link" href="/acesso">
             Fazer login ou cadastro
           </a>

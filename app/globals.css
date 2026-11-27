@@ -2286,6 +2286,39 @@ input:focus-visible {
   background: #f4fbff;
 }
 
+/* Recursos inclusos na oferta: as mesmas fichas translúcidas do hero, com um
+   ponto amarelo que liga o que está incluso ao botão de compra. */
+.paid-offer__features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.paid-offer__features li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  background: rgba(8, 65, 123, 0.34);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.paid-offer__features li::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ffd166;
+}
+
 .bottom-banner {
   gap: 28px;
   margin-bottom: 54px;
