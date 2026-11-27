@@ -206,7 +206,7 @@ function ScheduleResult({ result }: { result: ScheduleCalculationResult }) {
       <section className="paid-offer">
         <div>
           <span>Versão paga</span>
-          <h2>Calendário anual por R$ 5,99</h2>
+          <h2>Calendário anual por R$ 49,90</h2>
           <p>
             Pague uma única vez e veja seu ano inteiro sem refazer contas todo
             mês. Seu acesso fica salvo na conta para consultar quando precisar.

@@ -22,9 +22,7 @@ type AccessState =
   | { kind: "email_confirmation"; email: string }
   | { kind: "authenticated"; user: User; profile: Profile };
 
-const alreadyRegisteredEmailMessage =
-  "Este e-mail já está cadastrado. Use a opção Entrar para acessar sua conta.";
-const pagBankPaymentUrl = "https://pag.ae/8255taD9t/button";
+const pagBankPaymentUrl = "https://pag.ae/82opimxEr";
 const pagBankButtonImageUrl =
   "https://assets.pagseguro.com.br/ps-integration-assets/botoes/pagamentos/205x30-pagar.gif";
 
@@ -90,43 +88,41 @@ export function AccessFlow() {
           throw new Error("Informe seu nome.");
         }
 
-        const { data, error: signUpError } = await supabase.auth.signUp({
+        // Cadastro e login passam pelo Route Handler: é onde existe limite de
+        // tentativas por IP e mensagem uniforme de erro.
+        const payload = await requestServerAuth("/api/access/register", {
+          name: normalizedName,
           email: email.trim().toLowerCase(),
           password,
-          options: {
-            data: { name: normalizedName },
-            emailRedirectTo: buildAccessRedirectUrl(),
-          },
         });
-        if (isAlreadyRegisteredAuthError(signUpError)) {
-          throw new Error(alreadyRegisteredEmailMessage);
-        }
-        if (signUpError) throw signUpError;
-        if (!data.user) throw new Error("Não foi possível criar a conta.");
-        if (isAlreadyRegisteredSignUp(data.user)) {
-          throw new Error(alreadyRegisteredEmailMessage);
-        }
 
-        if (!data.session) {
+        if (payload.requiresEmailConfirmation) {
           setState({
             kind: "email_confirmation",
-            email: data.user.email ?? email.trim(),
+            email: payload.user?.email ?? email.trim(),
           });
           return;
         }
 
-        const profile = await loadOwnProfile(data.user.id);
-        setState({ kind: "authenticated", user: data.user, profile });
-      } else {
-        const { data, error: signInError } =
-          await supabase.auth.signInWithPassword({
-            email: email.trim().toLowerCase(),
-            password,
-          });
-        if (signInError) throw signInError;
+        const user = await establishBrowserSession(payload);
+        if (!user) {
+          throw new Error("Não foi possível criar a conta.");
+        }
 
-        const profile = await loadOwnProfile(data.user.id);
-        setState({ kind: "authenticated", user: data.user, profile });
+        const profile = await loadOwnProfile(user.id);
+        setState({ kind: "authenticated", user, profile });
+      } else {
+        const payload = await requestServerAuth("/api/access/login", {
+          email: email.trim().toLowerCase(),
+          password,
+        });
+        const user = await establishBrowserSession(payload);
+        if (!user) {
+          throw new Error("Não foi possível iniciar sua sessão. Tente novamente.");
+        }
+
+        const profile = await loadOwnProfile(user.id);
+        setState({ kind: "authenticated", user, profile });
       }
     } catch (caught) {
       setError(toMessage(caught));
@@ -235,14 +231,20 @@ export function AccessFlow() {
 
           <label>
             <span>Senha</span>
+            {/* A senha mínima de 8 vale apenas para novas contas. No login o
+                campo fica livre para quem se cadastrou com a regra antiga. */}
             <input
               required
-              minLength={6}
+              minLength={mode === "register" ? 8 : undefined}
               type="password"
               autoComplete={mode === "register" ? "new-password" : "current-password"}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Mínimo de 6 caracteres"
+              placeholder={
+                mode === "register"
+                  ? "Mínimo de 8 caracteres"
+                  : "Sua senha"
+              }
             />
           </label>
 
@@ -257,24 +259,60 @@ export function AccessFlow() {
   );
 }
 
-function buildAccessRedirectUrl(): string {
-  return new URL("/acesso", window.location.origin).toString();
-}
+type ServerAuthResponse = {
+  user?: { id: string; email: string | null } | null;
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  requiresEmailConfirmation?: boolean;
+  message?: string;
+};
 
-function isAlreadyRegisteredSignUp(user: User | null): boolean {
-  return Array.isArray(user?.identities) && user.identities.length === 0;
-}
+async function requestServerAuth(
+  path: string,
+  body: Record<string, unknown>,
+): Promise<ServerAuthResponse> {
+  const response = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 
-function isAlreadyRegisteredAuthError(error: unknown): boolean {
-  if (!error || typeof error !== "object") {
-    return false;
+  let payload: ServerAuthResponse = {};
+  try {
+    payload = (await response.json()) as ServerAuthResponse;
+  } catch {
+    payload = {};
   }
 
-  const maybeAuthError = error as { code?: unknown; message?: unknown };
-  return (
-    maybeAuthError.code === "user_already_exists" ||
-    maybeAuthError.message === "User already registered"
-  );
+  if (!response.ok) {
+    throw new Error(payload.message ?? "Não foi possível continuar.");
+  }
+
+  return payload;
+}
+
+async function establishBrowserSession(
+  payload: ServerAuthResponse,
+): Promise<User | null> {
+  const supabase = createBrowserSupabaseClient();
+  if (!supabase) {
+    throw new Error("Supabase ainda não configurado.");
+  }
+
+  if (!payload.accessToken || !payload.refreshToken) {
+    return null;
+  }
+
+  const { data, error } = await supabase.auth.setSession({
+    access_token: payload.accessToken,
+    refresh_token: payload.refreshToken,
+  });
+
+  if (error || !data.user) {
+    throw new Error("Não foi possível iniciar sua sessão. Tente novamente.");
+  }
+
+  return data.user;
 }
 
 async function loadOwnProfile(userId: string): Promise<Profile> {

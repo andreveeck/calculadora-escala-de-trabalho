@@ -2,4 +2,4 @@
  * Preço do calendário anual vitalício em centavos.
  * Única fonte de verdade para todo o projeto.
  */
-export const ANNUAL_CALENDAR_PRICE_IN_CENTS = 599;
+export const ANNUAL_CALENDAR_PRICE_IN_CENTS = 4990;

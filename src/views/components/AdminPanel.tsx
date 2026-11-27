@@ -110,13 +110,38 @@ export function AdminPanel() {
     setError("");
     setIsLoading(true);
     try {
-      const { data, error: loginError } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
+      // O login administrativo passa pelo servidor: só assim existe limite de
+      // tentativas por IP/conta e resposta uniforme para credencial inválida.
+      const response = await fetch("/api/access/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       });
-      if (loginError) throw loginError;
+      const payload = (await response.json()) as {
+        user?: { id: string } | null;
+        accessToken?: string | null;
+        refreshToken?: string | null;
+        message?: string;
+      };
 
-      const isAdmin = await checkAdminRole(data.user.id);
+      if (!response.ok) {
+        throw new Error(payload.message ?? "Não foi possível entrar.");
+      }
+
+      if (!payload.accessToken || !payload.refreshToken || !payload.user) {
+        throw new Error("Não foi possível iniciar sua sessão. Tente novamente.");
+      }
+
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.setSession({
+          access_token: payload.accessToken,
+          refresh_token: payload.refreshToken,
+        });
+      if (sessionError || !sessionData.user) {
+        throw new Error("Não foi possível iniciar sua sessão. Tente novamente.");
+      }
+
+      const isAdmin = await checkAdminRole(sessionData.user.id);
       if (!isAdmin) {
         setAdminState("forbidden");
         return;

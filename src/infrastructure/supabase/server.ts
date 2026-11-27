@@ -115,11 +115,17 @@ export async function authenticateAdminRequest(
 
   const { data: profile, error } = await authenticated.adminClient
     .from("profiles")
-    .select("role")
+    .select("role,access_status")
     .eq("user_id", authenticated.user.id)
     .maybeSingle();
 
-  if (error || profile?.role !== "admin") {
+  // Bloquear o perfil revoga o acesso administrativo na hora, mesmo que o
+  // token do admin ainda esteja válido.
+  if (
+    error ||
+    profile?.role !== "admin" ||
+    profile.access_status === "blocked"
+  ) {
     return null;
   }
 

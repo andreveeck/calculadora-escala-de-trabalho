@@ -60,7 +60,7 @@ O `webhookSecret` é lido e injetado, mas **nunca usado**. O Mercado Pago assina
 - Nenhum componente chama `/api/payments/checkout` ou consome `/api/payments/webhook`. Todo o stack MP **nunca é exercitado em produção**. O pagamento real é o **link manual do PagBank** (`AccessFlow`) + liberação manual pelo admin.
 - Inconsistências perigosas se o MP for ativado no futuro:
   - `SupabasePaymentRepository.createPending` grava `provider: "mercado_pago"`; a rota admin (`POST /api/admin/access-users`) grava `provider: "pagbank"` e **não cria `external_id`** — o webhook MP procura por `external_id` e **não casaria** com as liberações manuais.
-  - O link PagBank (`https://pag.ae/8255taD9t/button`) não carrega `user_id`; a liberação depende da conciliação manual do admin.
+  - O link PagBank (`https://pag.ae/82opimxEr`, hoje em `src/views/components/AccessFlow.tsx`) não carrega `user_id`; a liberação depende da conciliação manual do admin.
 
 **Correção sugerida:** decidir **UM** canal:
 - **Opção A (manter PagBank manual):** apagar/arquivar o stack MP e as rotas `/api/payments/*`.
