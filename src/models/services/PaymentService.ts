@@ -29,7 +29,7 @@ export class PaymentService {
     const checkout = await this.gateway.createCheckout({
       userId,
       amountInCents: PaymentService.annualCalendarPriceInCents,
-      description: "Minha Escala - calendário anual vitalício",
+      description: "Minha Escala - assinatura anual do calendário",
     });
     const existing = await this.paymentRepository.findByExternalId(
       checkout.externalId,

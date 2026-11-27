@@ -208,9 +208,9 @@ function ScheduleResult({ result }: { result: ScheduleCalculationResult }) {
           <span>Versão paga</span>
           <h2>Calendário anual por R$ 49,90</h2>
           <p>
-            Pague uma única vez e veja seu ano inteiro sem refazer contas todo
-            mês. A escala impressa vai para a geladeira; o PDF fica no celular.
-            O acesso fica salvo na sua conta.
+            Assinatura anual com renovação automática: você vê seu ano inteiro
+            sem refazer contas todo mês. A escala impressa vai para a geladeira;
+            o PDF fica no celular.
           </p>
           <ul
             className="paid-offer__features"

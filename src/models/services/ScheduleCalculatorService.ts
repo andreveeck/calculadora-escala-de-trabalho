@@ -34,7 +34,7 @@ export class ScheduleCalculatorService {
       ),
       paidPreview: {
         priceInCents: ANNUAL_CALENDAR_PRICE_IN_CENTS,
-        benefit: "Calendário anual vitalício e consulta de qualquer período de 12 meses.",
+        benefit: "Assinatura anual com 12 meses de calendário e consulta de qualquer período.",
       },
     };
   }
