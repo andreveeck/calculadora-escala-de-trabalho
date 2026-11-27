@@ -15,8 +15,15 @@ export default function TermsPage() {
         empresa em caso de dúvida.
       </p>
       <p>
-        O calendário anual pago tem pagamento único e acesso vitalício para a
-        conta vinculada após confirmação segura do pagamento.
+        O calendário anual é uma assinatura com pagamento recorrente por período
+        de 12 meses. O pagamento não é único: ele libera 12 meses de acesso na
+        conta vinculada ao cadastro, contados da confirmação segura do primeiro
+        pagamento.
+      </p>
+      <p>
+        A renovação é automática: a cada 12 meses uma nova cobrança é feita para
+        manter o acesso. Se a cobrança não for aprovada, o acesso ao calendário
+        anual é descontinuado até que o pagamento seja regularizado.
       </p>
     </main>
   );
