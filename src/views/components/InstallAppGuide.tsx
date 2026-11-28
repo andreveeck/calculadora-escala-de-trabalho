@@ -109,6 +109,16 @@ function detectPlatform(): Platform {
   return "other";
 }
 
+// Navegadores em que o instalador nativo existe quando o Chrome/Chromium
+// libera o evento. Serve para separar "ainda não disparou" de "não existe".
+function isChromium(platform: Platform): boolean {
+  return (
+    platform === "chrome-android" ||
+    platform === "chrome-desktop" ||
+    platform === "samsung"
+  );
+}
+
 function isStandalone(): boolean {
   if (typeof window === "undefined") {
     return false;
@@ -218,9 +228,13 @@ export function InstallAppGuide() {
 
   const guide = STEPS[platform];
 
-  // iOS e Firefox nunca disparam "beforeinstallprompt": nesses navegadores o
-  // atalho só sai pelo menu, então o botão não pode prometer instalação.
-  const buttonLabel = canPrompt ? "Instalar aplicativo" : "Ver como instalar";
+  // O texto do guia depende do evento, mas só aparece depois do clique — nunca
+  // no HTML do servidor, então não há divergência na hidratação.
+  const guideIntro = canPrompt
+    ? "Siga o passo a passo:"
+    : isChromium(platform)
+      ? "O navegador não liberou o instalador automático para esta página (ele exige HTTPS e algum uso do site). Instale pelo menu:"
+      : "Este navegador não abre o instalador direto pela página. Siga o passo a passo:";
 
   return (
     <section className="install-app" aria-labelledby="install-app-title">
@@ -230,12 +244,6 @@ export function InstallAppGuide() {
           <p>
             Abra em tela cheia, direto pelo ícone, sem digitar o endereço.
           </p>
-          {!canPrompt ? (
-            <p className="install-app-hint">
-              No {guide.title}, o atalho é criado pelo menu do navegador — o
-              passo a passo está no botão ao lado.
-            </p>
-          ) : null}
         </div>
         <button
           type="button"
@@ -244,7 +252,7 @@ export function InstallAppGuide() {
           aria-controls="install-app-steps"
           onClick={handleClick}
         >
-          {buttonLabel}
+          Instalar aplicativo
         </button>
       </div>
 
@@ -256,10 +264,7 @@ export function InstallAppGuide() {
 
       {open ? (
         <div className="install-app-body" id="install-app-steps">
-          <p className="install-app-note">
-            Este navegador não abre o instalador direto pela página. Siga o passo
-            a passo:
-          </p>
+          <p className="install-app-note">{guideIntro}</p>
 
           <h3>{guide.title}</h3>
           <ol className="install-app-steps">

@@ -133,6 +133,16 @@ function detectPlatform(): Platform {
   return "other";
 }
 
+// Navegadores em que o instalador nativo existe quando o Chrome/Chromium
+// libera o evento. Serve para separar "ainda não disparou" de "não existe".
+function isChromium(platform: Platform): boolean {
+  return (
+    platform === "chrome-android" ||
+    platform === "chrome-desktop" ||
+    platform === "samsung"
+  );
+}
+
 function isStandalone(): boolean {
   if (typeof window === "undefined") {
     return false;
@@ -242,9 +252,13 @@ export function InstallAppGuide() {
 
   const guide = STEPS[platform];
 
-  // iOS e Firefox nunca disparam "beforeinstallprompt": nesses navegadores o
-  // atalho só sai pelo menu, então o botão não pode prometer instalação.
-  const buttonLabel = canPrompt ? "Instalar aplicativo" : "Ver como instalar";
+  // O texto do guia depende do evento, mas só aparece depois do clique — nunca
+  // no HTML do servidor, então não há divergência na hidratação.
+  const guideIntro = canPrompt
+    ? "Siga o passo a passo:"
+    : isChromium(platform)
+      ? "O navegador não liberou o instalador automático para esta página (ele exige HTTPS e algum uso do site). Instale pelo menu:"
+      : "Este navegador não abre o instalador direto pela página. Siga o passo a passo:";
 
   return (
     <section className="install-app" aria-labelledby="install-app-title">
@@ -254,12 +268,6 @@ export function InstallAppGuide() {
           <p>
             Abra em tela cheia, direto pelo ícone, sem digitar o endereço.
           </p>
-          {!canPrompt ? (
-            <p className="install-app-hint">
-              No {guide.title}, o atalho é criado pelo menu do navegador — o
-              passo a passo está no botão ao lado.
-            </p>
-          ) : null}
         </div>
         <button
           type="button"
@@ -268,7 +276,7 @@ export function InstallAppGuide() {
           aria-controls="install-app-steps"
           onClick={handleClick}
         >
-          {buttonLabel}
+          Instalar aplicativo
         </button>
       </div>
 
@@ -280,10 +288,7 @@ export function InstallAppGuide() {
 
       {open ? (
         <div className="install-app-body" id="install-app-steps">
-          <p className="install-app-note">
-            Este navegador não abre o instalador direto pela página. Siga o passo
-            a passo:
-          </p>
+          <p className="install-app-note">{guideIntro}</p>
 
           <h3>{guide.title}</h3>
           <ol className="install-app-steps">
@@ -464,11 +469,6 @@ Fica no topo, logo abaixo do cabeçalho. Antes estava depois do cálculo e caía
   line-height: 1.4;
 }
 
-.install-app-head p.install-app-hint {
-  margin-top: 4px;
-  font-size: 0.8rem;
-}
-
 .install-app-toggle {
   min-height: 44px;
   padding: 0 18px;
@@ -539,7 +539,9 @@ Fica no topo, logo abaixo do cabeçalho. Antes estava depois do cálculo e caía
 
 ## 8. Regras e limitações
 
-- **Só Chromium dispara `beforeinstallprompt`.** Safari/iOS e Firefox nunca disparam. Consequência prática: **nesses navegadores o botão não instala nada** — ele não tem como: o atalho só sai pelo menu do próprio navegador. Por isso o rótulo muda para **"Ver como instalar"** e um aviso explica que o caminho é o menu, com o passo a passo ao lado.
+- **Só Chromium dispara `beforeinstallprompt`.** Safari/iOS e Firefox nunca disparam — nesses navegadores o atalho só sai pelo menu do próprio navegador, e nenhuma API permite automatizar isso.
+- **O rótulo do botão é fixo em "Instalar aplicativo" e não depende do evento.** `beforeinstallprompt` não existe no servidor, então um rótulo derivado dele nasceria errado no HTML e piscaria na hidratação. O que muda por navegador é o texto do guia, que só entra no DOM depois do clique.
+- **"Evento não disparou" ≠ "navegador sem instalador".** O guia separa os dois casos: em Chromium (Chrome/Edge/Samsung) a nota diz que o navegador não liberou o instalador automático para aquela página (exige HTTPS e algum uso) e manda usar o menu; em Safari/Firefox diz que o instalador pela página não existe ali.
 - **Não é possível automatizar o menu ⋮ do Chrome.** O navegador não expõe nenhuma API para isso; `prompt()` é o único caminho programático.
 - **O evento é de uso único.** Depois do primeiro `prompt()`, chamá-lo de novo não abre nada.
 - **Exige HTTPS ou localhost.** Em `http://` de rede local (ex.: `http://192.168.x.x`) o Chrome não considera instalável.

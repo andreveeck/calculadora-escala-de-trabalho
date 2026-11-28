@@ -3538,11 +3538,6 @@ button.admin-lock {
   line-height: 1.4;
 }
 
-.install-app-head p.install-app-hint {
-  margin-top: 4px;
-  font-size: 0.8rem;
-}
-
 .install-app-toggle {
   min-height: 44px;
   padding: 0 18px;
