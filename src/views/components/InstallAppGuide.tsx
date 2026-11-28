@@ -224,7 +224,8 @@ export function InstallAppGuide() {
         <div>
           <h2 id="install-app-title">Use como aplicativo</h2>
           <p>
-            Abra em tela cheia, direto pelo ícone, sem digitar o endereço.
+            Para Android e iOS (iPhone/iPad): abra em tela cheia, direto pelo
+            ícone, sem digitar o endereço.
           </p>
         </div>
         <button
