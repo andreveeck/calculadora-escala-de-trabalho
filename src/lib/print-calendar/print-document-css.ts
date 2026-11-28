@@ -13,14 +13,14 @@ export const PRINT_DOCUMENT_CSS = `
   align-items: baseline;
   justify-content: space-between;
   gap: 1mm 6mm;
-  margin: 0 0 5mm;
+  margin: 0 0 var(--print-gap);
   padding: 0 0 3mm;
   border-bottom: 1px solid #c9d6e2;
 }
 
 .print-doc__title {
   margin: 0;
-  font-size: 14pt;
+  font-size: var(--print-document-title-size);
   color: #17477e;
 }
 
@@ -29,42 +29,106 @@ export const PRINT_DOCUMENT_CSS = `
   flex-wrap: wrap;
   gap: 1mm 5mm;
   margin: 0;
-  font-size: 8.5pt;
+  font-size: var(--print-meta-size);
   color: #3d4c5e;
 }
 
 .print-doc__months {
   display: grid;
-  gap: 4mm;
+  gap: var(--print-gap);
 }
 
+/* Colunas da grade por layout. Ficam antes das regras por papel para que
+   A5/A6 possam empilhar os meses em largura total. */
 .print-layout-one-per-page .print-doc__months { grid-template-columns: 1fr; }
 .print-layout-two-per-page .print-doc__months { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .print-layout-three-per-page .print-doc__months { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
+/* Cada bloco .print-doc__page é uma folha: contém exatamente os meses do
+   layout escolhido, então o número de páginas do diálogo confere com o papel. */
+.print-doc__pages {
+  display: grid;
+  gap: 0;
+}
+
+.print-doc__page {
+  display: flex;
+  flex-direction: column;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.print-doc__page:not(:last-child) {
+  break-after: page;
+  page-break-after: always;
+}
+
+/* A4 mantém o cabeçalho só na primeira folha. */
+.print-paper-a4 .print-doc__page:not(:first-child) .print-doc__header {
+  display: none;
+}
+
+/* A5 e A6: meses empilhados em largura total, preenchendo a folha inteira. */
+.print-paper-a5 .print-doc__page,
+.print-paper-a6 .print-doc__page {
+  /* Altura fixa = área útil da folha: a página nunca transborda para uma
+     folha extra em branco, e o conteúdo é dimensionado para caber. */
+  height: calc(var(--print-page-content-height, 0mm) - 4mm);
+  overflow: hidden;
+  justify-content: space-between;
+}
+
+.print-paper-a5 .print-doc__months,
+.print-paper-a6 .print-doc__months {
+  flex: 1 1 auto;
+  min-height: 0;
+  grid-template-columns: 1fr;
+  align-content: stretch;
+  grid-auto-rows: minmax(0, 1fr);
+}
+
+/* Paisagem tem largura sobrando e altura curta: em vez de empilhar, os meses
+   ficam lado a lado e preenchem a folha na horizontal. */
+.print-paper-a5.print-orientation-landscape.print-layout-two-per-page .print-doc__months {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.print-paper-a5 .print-doc__month,
+.print-paper-a6 .print-doc__month {
+  display: flex;
+  flex-direction: column;
+}
+
+.print-paper-a5 .annual-mini-month,
+.print-paper-a6 .annual-mini-month {
+  flex: 1 1 auto;
+  /* min-height: 0 permite encolher até o espaço que a folha oferece; sem isso
+     o mini-mês empurra o conteúdo para fora da página. */
+  min-height: 0;
+  align-content: stretch;
+  grid-auto-rows: minmax(0, 1fr);
+}
+
+.print-paper-a5 .annual-empty-day,
+.print-paper-a5 .annual-mini-day,
+.print-paper-a6 .annual-empty-day,
+.print-paper-a6 .annual-mini-day {
+  min-height: 0;
+  aspect-ratio: auto;
+}
+
 .print-doc__month {
   break-inside: avoid;
   page-break-inside: avoid;
-  padding: 3mm;
+  padding: var(--print-month-padding);
   border: 1px solid #c9d6e2;
   border-radius: 2mm;
   background: #ffffff;
 }
 
-/* Evita a última página em branco. */
-.print-layout-one-per-page .print-doc__month {
-  break-after: page;
-  page-break-after: always;
-}
-
-.print-layout-one-per-page .print-doc__month:last-child {
-  break-after: auto;
-  page-break-after: auto;
-}
-
 .print-doc__month h2 {
   margin: 0 0 2.5mm;
-  font-size: 10.5pt;
+  font-size: var(--print-month-title-size);
   color: #215896;
 }
 
@@ -88,7 +152,7 @@ export const PRINT_DOCUMENT_CSS = `
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1mm 0;
+  padding: var(--print-day-padding) 0;
   background: #e8f1ff;
   color: #17477e;
   font-weight: 700;
@@ -96,8 +160,8 @@ export const PRINT_DOCUMENT_CSS = `
   text-align: center;
 }
 
-.print-doc .annual-mini-day strong { font-size: 7pt; }
-.print-doc .annual-mini-day small { font-size: 5.5pt; font-weight: 700; }
+.print-doc .annual-mini-day strong { font-size: var(--print-day-size); }
+.print-doc .annual-mini-day small { font-size: var(--print-weekday-size); font-weight: 700; }
 
 .print-doc .annual-mini-day.rest {
   background: #188b54;
@@ -132,17 +196,27 @@ export const PRINT_DOCUMENT_CSS = `
 
 /* Feriados do mês escritos dentro do container do mês. */
 .print-doc .annual-month-holidays {
+  display: flex;
+  flex-direction: column;
   gap: 0.4mm;
   margin: 2mm 0 0;
   padding: 1.2mm 0 0;
   border-top: 1px solid #c9d6e2;
   color: #0b1b2b;
-  font-size: 6pt;
+  font-size: var(--print-holidays-size);
   line-height: 1.2;
 }
 
+/* A tela usa flex; a impressão precisa repetir, senão data e nome ficam
+   colados ("02/11Finados"). */
 .print-doc .annual-month-holidays__item {
+  display: flex;
+  align-items: baseline;
   gap: 1mm;
+}
+
+.print-doc .annual-month-holidays__date {
+  white-space: nowrap;
 }
 
 .print-doc .annual-month-holidays__name {
@@ -162,40 +236,4 @@ export const PRINT_DOCUMENT_CSS = `
   color: #9d174d;
 }
 
-.print-doc__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2mm 5mm;
-  margin: 4mm 0 0;
-  padding: 0;
-  list-style: none;
-  color: #3d4c5e;
-  font-size: 8pt;
-}
-
-.print-doc__legend li {
-  display: flex;
-  align-items: center;
-  gap: 1.5mm;
-}
-
-.print-doc__legend li::before {
-  content: "";
-  width: 2.8mm;
-  height: 2.8mm;
-  border: 0.5mm solid transparent;
-  border-radius: 999px;
-}
-
-.print-doc__legend-item--national::before {
-  border-color: #b45309;
-}
-
-.print-doc__legend-item--optional::before {
-  border-color: #7e22ce;
-}
-
-.print-doc__legend-item--state::before {
-  border-color: #9d174d;
-}
 `;

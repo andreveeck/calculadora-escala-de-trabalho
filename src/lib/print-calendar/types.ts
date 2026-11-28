@@ -1,5 +1,6 @@
 import type { WorkDay } from "@/src/models/entities/WorkDay";
 
+export type PrintPaper = "a4" | "a5" | "a6";
 export type PrintOrientation = "portrait" | "landscape";
 export type PrintMargins = "narrow" | "normal" | "wide";
 export type PrintLayout = "one-per-page" | "two-per-page" | "three-per-page";
@@ -18,6 +19,8 @@ export interface PrintOptions {
   startMonthKey: string;
   /** Quantidade de meses a imprimir, a partir de `startMonthKey`. */
   monthCount: number;
+  /** Tamanho do papel. Limita o layout e redefine margens e tipografia. */
+  paper: PrintPaper;
   orientation: PrintOrientation;
   margins: PrintMargins;
   layout: PrintLayout;

@@ -68,8 +68,10 @@ export function AnnualCalendarExperience({
       ? referenceDate
       : BrazilDate.today().toIso();
     const safeStartMonth = BrazilDate.today().toIso().slice(0, 7);
+    // O link de compartilhamento mostra só o mês atual.
+    const monthCount = readOnly ? 1 : 12;
 
-    return Array.from({ length: 12 }, (_, index) => {
+    return Array.from({ length: monthCount }, (_, index) => {
       const normalizedMonth = addMonths(`${safeStartMonth}-01`, index);
       const result = controller.calculate({
         scheduleType,
@@ -83,7 +85,7 @@ export function AnnualCalendarExperience({
         days: result.currentMonth,
       };
     });
-  }, [controller, referenceDate, scheduleType]);
+  }, [controller, readOnly, referenceDate, scheduleType]);
 
   const [printOpen, setPrintOpen] = useState(false);
   const [printOptions, setPrintOptions] = useState<PrintOptions>(() =>
@@ -179,11 +181,11 @@ export function AnnualCalendarExperience({
             <p className="eyebrow">
               {readOnly ? "Calendário compartilhado" : "Acesso anual liberado"}
             </p>
-            <h1>Calendário de 12 meses</h1>
+            <h1>{readOnly ? "Calendário do mês" : "Calendário de 12 meses"}</h1>
             <p>
-              Consulte qualquer período do ano, veja suas folgas com
-              antecedência e compartilhe o calendário com quem organiza a rotina
-              com você.
+              {readOnly
+                ? "Veja as folgas do mês atual e confira os feriados do período."
+                : "Consulte qualquer período do ano, veja suas folgas com antecedência e compartilhe o calendário com quem organiza a rotina com você."}
             </p>
           </div>
         </section>
@@ -260,12 +262,17 @@ export function AnnualCalendarExperience({
             </ul>
           </div>
 
-          <button type="button" onClick={() => setPrintOpen(true)}>
-            Imprimir calendário
-          </button>
+          {readOnly ? null : (
+            <button type="button" onClick={() => setPrintOpen(true)}>
+              Imprimir calendário
+            </button>
+          )}
         </div>
 
-        <section className="annual-calendar-grid" aria-label="Calendário anual">
+        <section
+          className={`annual-calendar-grid${readOnly ? " annual-calendar-grid--single" : ""}`}
+          aria-label={readOnly ? "Calendário do mês" : "Calendário anual"}
+        >
           {months.map((month) => (
             <article className="annual-month" key={month.key}>
               <h2>{month.label}</h2>
@@ -286,12 +293,14 @@ export function AnnualCalendarExperience({
           </article>
           <article>
             <span>Período</span>
-            <strong>12 meses</strong>
+            <strong>
+              {months.length} {months.length === 1 ? "mês" : "meses"}
+            </strong>
           </article>
         </section>
       </main>
 
-      {printOpen ? (
+      {printOpen && !readOnly ? (
         <PrintCalendarDialog
           months={months}
           initialOptions={printOptions}
@@ -310,17 +319,19 @@ export function AnnualCalendarExperience({
         O contêiner oculto fica FORA do ref: display: none é o padrão
         documentado pela biblioteca e não afeta o clone.
       */}
-      <div aria-hidden="true" style={{ display: "none" }}>
-        <div ref={printDocumentRef}>
-          <PrintCalendarDocument
-            months={months}
-            options={printOptions}
-            scheduleType={scheduleType}
-            referenceDate={referenceDate}
-            region={region}
-          />
+      {readOnly ? null : (
+        <div aria-hidden="true" style={{ display: "none" }}>
+          <div ref={printDocumentRef}>
+            <PrintCalendarDocument
+              months={months}
+              options={printOptions}
+              scheduleType={scheduleType}
+              referenceDate={referenceDate}
+              region={region}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
