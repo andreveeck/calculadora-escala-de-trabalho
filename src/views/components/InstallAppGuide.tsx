@@ -218,15 +218,24 @@ export function InstallAppGuide() {
 
   const guide = STEPS[platform];
 
+  // iOS e Firefox nunca disparam "beforeinstallprompt": nesses navegadores o
+  // atalho só sai pelo menu, então o botão não pode prometer instalação.
+  const buttonLabel = canPrompt ? "Instalar aplicativo" : "Ver como instalar";
+
   return (
     <section className="install-app" aria-labelledby="install-app-title">
       <div className="install-app-head">
         <div>
           <h2 id="install-app-title">Use como aplicativo</h2>
           <p>
-            Para Android e iOS (iPhone/iPad): abra em tela cheia, direto pelo
-            ícone, sem digitar o endereço.
+            Abra em tela cheia, direto pelo ícone, sem digitar o endereço.
           </p>
+          {!canPrompt ? (
+            <p className="install-app-hint">
+              No {guide.title}, o atalho é criado pelo menu do navegador — o
+              passo a passo está no botão ao lado.
+            </p>
+          ) : null}
         </div>
         <button
           type="button"
@@ -235,7 +244,7 @@ export function InstallAppGuide() {
           aria-controls="install-app-steps"
           onClick={handleClick}
         >
-          {canPrompt ? "Instalar aplicativo" : "Instalar e criar atalho"}
+          {buttonLabel}
         </button>
       </div>
 
