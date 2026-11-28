@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { getSiteUrl } from "@/src/views/presenters/siteUrl";
@@ -26,9 +26,21 @@ export const metadata: Metadata = {
   verification: {
     google: "kWzYP7a99izKNojnNBZiZMrVHx9n9WDn2NZTv7yKvh4",
   },
+  manifest: "/manifest.webmanifest",
+  applicationName: "Minha Escala",
+  appleWebApp: {
+    capable: true,
+    title: "Minha Escala",
+    statusBarStyle: "default",
+  },
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/pwa-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/pwa-512.png", sizes: "512x512", type: "image/png" },
+    ],
     shortcut: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     title: "Minha Escala",
@@ -36,6 +48,10 @@ export const metadata: Metadata = {
       "Veja seus dias de trabalho, folga, próxima pausa e calendário do mês.",
     type: "website",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#146b5f",
 };
 
 export default function RootLayout({

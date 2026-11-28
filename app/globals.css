@@ -3376,3 +3376,101 @@ button.admin-lock {
     font-size: 0.9rem;
   }
 }
+
+/* Instalacao do app (PWA) */
+.install-app {
+  width: min(1160px, calc(100% - 32px));
+  margin: 0 auto 28px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 10px 26px rgba(33, 88, 150, 0.08);
+}
+
+.install-app-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.install-app-head h2 {
+  margin: 0 0 4px;
+  color: var(--brand-strong);
+  font-size: 1.05rem;
+}
+
+.install-app-head p {
+  margin: 0;
+  max-width: 56ch;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.install-app-toggle {
+  min-height: 46px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent-strong);
+  color: #ffffff;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.install-app-toggle:hover {
+  background: #249d5b;
+}
+
+.install-app-body {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.install-app-body h3 {
+  margin: 14px 0 8px;
+  color: var(--foreground);
+  font-size: 0.95rem;
+}
+
+.install-app-steps {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 22px;
+  color: var(--foreground);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+.install-app-steps li::marker {
+  color: var(--accent-strong);
+  font-weight: 800;
+}
+
+.install-app-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.install-app-feedback {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .install-app-toggle {
+    width: 100%;
+  }
+}
