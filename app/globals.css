@@ -498,6 +498,134 @@ h2 {
   text-transform: capitalize;
 }
 
+.calendar-day.locked {
+  border-style: dashed;
+  background: #f3f6fa;
+  color: var(--muted);
+}
+
+.calendar-day.locked span {
+  color: var(--muted);
+  opacity: 0.55;
+}
+
+.calendar-day.locked small {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.month-calendar__locked-note {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.month-calendar__locked-note a {
+  color: var(--brand);
+  font-weight: 800;
+}
+
+@media (max-width: 480px) {
+  .calendar-day.locked {
+    padding: 4px;
+  }
+
+  .calendar-day.locked span {
+    font-size: 0.85rem;
+  }
+
+  .calendar-day.locked small {
+    font-size: 0.55rem;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+}
+
+.plan-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(9, 24, 42, 0.55);
+}
+
+.plan-modal {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  width: min(440px, 100%);
+  padding: 28px 24px 22px;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 28px 70px rgba(9, 24, 42, 0.35);
+}
+
+.plan-modal h2 {
+  padding-right: 24px;
+  color: var(--brand);
+  font-size: clamp(1.5rem, 4vw, 1.95rem);
+  line-height: 1.15;
+}
+
+.plan-modal p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.plan-modal ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--foreground);
+  line-height: 1.4;
+  list-style: disc;
+}
+
+.plan-modal .paid-action {
+  justify-content: center;
+  margin-top: 4px;
+  text-align: center;
+}
+
+.plan-modal__close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.plan-modal__close:hover,
+.plan-modal__close:focus-visible {
+  background: rgba(9, 24, 42, 0.08);
+  color: var(--foreground);
+}
+
+.plan-modal__dismiss {
+  padding: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .paid-offer {
   display: grid;
   grid-template-columns: 1fr auto;

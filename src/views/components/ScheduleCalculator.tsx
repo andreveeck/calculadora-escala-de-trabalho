@@ -1,11 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createScheduleController } from "@/src/controllers/controllerFactory";
 import { BrazilDate } from "@/src/shared/date/BrazilDate";
+import { ANNUAL_CALENDAR_PRICE_IN_CENTS } from "@/src/shared/constants/pricing";
 import type { ScheduleCalculationResult } from "@/src/shared/dto/ScheduleDtos";
 import type { ScheduleType } from "@/src/models/schedules/ScheduleType";
+
+/** Dias do mês visíveis na versão gratuita. */
+const FREE_VISIBLE_DAYS = 15;
+/** Tempo até o pop-up do plano anual aparecer. */
+const ANNUAL_PLAN_MODAL_DELAY_MS = 8000;
 
 const scheduleOptions: Array<{
   type: ScheduleType;
@@ -70,6 +76,36 @@ export function ScheduleCalculator({
     }),
   );
   const [error, setError] = useState<string | null>(null);
+  const [planModalOpen, setPlanModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!result) {
+      return;
+    }
+
+    const timer = window.setTimeout(
+      () => setPlanModalOpen(true),
+      ANNUAL_PLAN_MODAL_DELAY_MS,
+    );
+
+    return () => window.clearTimeout(timer);
+  }, [result]);
+
+  useEffect(() => {
+    if (!planModalOpen) {
+      return;
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setPlanModalOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [planModalOpen]);
 
   function calculate() {
     try {
@@ -162,6 +198,10 @@ export function ScheduleCalculator({
       </div>
 
       {result ? <ScheduleResult result={result} /> : null}
+
+      {planModalOpen ? (
+        <AnnualPlanModal onClose={() => setPlanModalOpen(false)} />
+      ) : null}
     </section>
   );
 }
@@ -200,7 +240,10 @@ function ScheduleResult({ result }: { result: ScheduleCalculationResult }) {
         <div className="section-heading">
           <h2>{formatMonthTitle(result.currentMonth[0]?.date)}</h2>
         </div>
-        <MonthCalendar days={result.currentMonth} />
+        <MonthCalendar
+          days={result.currentMonth}
+          visibleDays={FREE_VISIBLE_DAYS}
+        />
       </section>
 
       <section className="paid-offer">
@@ -246,30 +289,110 @@ function StatusCard({
   );
 }
 
-function MonthCalendar({ days }: { days: ScheduleCalculationResult["currentMonth"] }) {
+function MonthCalendar({
+  days,
+  visibleDays,
+}: {
+  days: ScheduleCalculationResult["currentMonth"];
+  visibleDays?: number;
+}) {
   const firstDay = new Date(`${days[0]?.date ?? "2026-01-01"}T00:00:00.000Z`);
   const offset = firstDay.getUTCDay();
+  const unlockedCount = Math.min(visibleDays ?? days.length, days.length);
+  const hasLockedDays = unlockedCount < days.length;
 
   const monthLabel = days[0]
     ? formatMonthTitle(days[0].date)
     : "Calendário";
 
   return (
-    <div className="month-calendar" role="grid" aria-label={monthLabel}>
-      {Array.from({ length: offset }, (_, index) => (
-        <span className="empty-day" key={`empty-${index}`} role="presentation" />
-      ))}
-      {days.map((day) => (
-        <div
-          className={`calendar-day ${day.status}`}
-          role="gridcell"
-          aria-label={`${Number(day.date.slice(-2))}, ${formatWeekday(day.date)}, ${day.status === "rest" ? "Folga" : "Trabalho"}`}
-          key={day.date}
+    <div className="month-calendar-block">
+      <div className="month-calendar" role="grid" aria-label={monthLabel}>
+        {Array.from({ length: offset }, (_, index) => (
+          <span className="empty-day" key={`empty-${index}`} role="presentation" />
+        ))}
+        {days.map((day, index) => {
+          if (index >= unlockedCount) {
+            return (
+              <div
+                className="calendar-day locked"
+                role="gridcell"
+                aria-label="Dia disponível apenas no plano anual"
+                key={day.date}
+              >
+                <span aria-hidden="true">•</span>
+                <small className="calendar-weekday">Anual</small>
+              </div>
+            );
+          }
+
+          return (
+            <div
+              className={`calendar-day ${day.status}`}
+              role="gridcell"
+              aria-label={`${Number(day.date.slice(-2))}, ${formatWeekday(day.date)}, ${day.status === "rest" ? "Folga" : "Trabalho"}`}
+              key={day.date}
+            >
+              <span>{Number(day.date.slice(-2))}</span>
+              <small className="calendar-weekday">{formatWeekdayShort(day.date)}</small>
+            </div>
+          );
+        })}
+      </div>
+
+      {hasLockedDays ? (
+        <p className="month-calendar__locked-note">
+          Na versão gratuita você vê os dias 1 a {unlockedCount}. Os dias{" "}
+          {unlockedCount + 1} a {days.length} e os próximos 11 meses ficam no
+          plano anual.{" "}
+          <a href="/acesso">Liberar calendário completo</a>
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function AnnualPlanModal({ onClose }: { onClose: () => void }) {
+  const price = (
+    ANNUAL_CALENDAR_PRICE_IN_CENTS / 100
+  ).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  return (
+    <div className="plan-modal-backdrop">
+      <div
+        className="plan-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="plan-modal-title"
+      >
+        <button
+          type="button"
+          className="plan-modal__close"
+          aria-label="Fechar oferta"
+          onClick={onClose}
         >
-          <span>{Number(day.date.slice(-2))}</span>
-          <small className="calendar-weekday">{formatWeekdayShort(day.date)}</small>
-        </div>
-      ))}
+          ×
+        </button>
+
+        <p className="eyebrow">Plano anual</p>
+        <h2 id="plan-modal-title">Veja o mês inteiro e o ano completo</h2>
+        <p>
+          No plano gratuito o calendário mostra só os 15 primeiros dias do mês.
+          Com o plano anual por {price} você libera todos os dias e os próximos
+          12 meses.
+        </p>
+        <ul aria-label="O que o plano anual inclui">
+          <li>Calendário de 12 meses</li>
+          <li>Impressão em A4 e PDF</li>
+        </ul>
+
+        <a className="paid-action" href="/acesso">
+          Quero o plano anual
+        </a>
+        <button type="button" className="plan-modal__dismiss" onClick={onClose}>
+          Continuar no gratuito
+        </button>
+      </div>
     </div>
   );
 }
