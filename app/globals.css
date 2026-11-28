@@ -3380,8 +3380,8 @@ button.admin-lock {
 /* Instalacao do app (PWA) */
 .install-app {
   width: min(1160px, calc(100% - 32px));
-  margin: 0 auto 28px;
-  padding: 18px 20px;
+  margin: 14px auto 0;
+  padding: 12px 16px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
@@ -3397,22 +3397,22 @@ button.admin-lock {
 }
 
 .install-app-head h2 {
-  margin: 0 0 4px;
+  margin: 0 0 2px;
   color: var(--brand-strong);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
 }
 
 .install-app-head p {
   margin: 0;
   max-width: 56ch;
   color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.5;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 .install-app-toggle {
-  min-height: 46px;
-  padding: 0 20px;
+  min-height: 44px;
+  padding: 0 18px;
   border: 0;
   border-radius: 8px;
   background: var(--accent-strong);

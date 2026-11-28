@@ -224,8 +224,7 @@ export function InstallAppGuide() {
         <div>
           <h2 id="install-app-title">Use como aplicativo</h2>
           <p>
-            Instale a Minha Escala no celular ou no computador para abrir em tela
-            cheia, direto pelo ícone, sem digitar o endereço.
+            Abra em tela cheia, direto pelo ícone, sem digitar o endereço.
           </p>
         </div>
         <button

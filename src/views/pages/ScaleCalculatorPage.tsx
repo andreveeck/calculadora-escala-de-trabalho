@@ -20,8 +20,8 @@ export function ScaleCalculatorPage({
 }: ScaleCalculatorPageProps) {
   return (
     <main>
-      <ScheduleCalculator initialScheduleType={scheduleType} />
       <InstallAppGuide />
+      <ScheduleCalculator initialScheduleType={scheduleType} />
       <section className="bottom-banner" aria-label="Banner informativo">
         <div>
           <h2>{title}</h2>
